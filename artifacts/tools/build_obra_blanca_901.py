@@ -241,9 +241,9 @@ def draw_kitchen(d, detail):
     for cx, cy in ((257, 17), (283, 17), (257, 43), (283, 43)):
         d.a(f'<circle cx="{cx}" cy="{cy}" r="8" class="burner"/>')
     # ropas
-    d.a('<rect x="255" y="170" width="40" height="60" class="m-lower ol"/>')
-    d.a('<rect x="295" y="172" width="50" height="58" class="lav ol"/><rect x="302" y="180" width="36" height="40" rx="4" class="lavb"/>')
-    d.a('<rect x="347" y="170" width="56" height="58" class="own"/><circle cx="375" cy="199" r="21" class="own"/>')
+    d.a('<rect x="257" y="170" width="56" height="58" class="own"/><circle cx="285" cy="199" r="21" class="own"/>')
+    d.a('<rect x="315" y="172" width="50" height="58" class="lav ol"/><rect x="322" y="180" width="36" height="40" rx="4" class="lavb"/>')
+    d.a('<rect x="365" y="170" width="40" height="60" class="m-lower ol"/>')
     if detail:
         d.a('<rect x="70" y="0" width="270" height="35" class="hid"/>')
         d.t(40, 36, 'Nevera', size=0.8)
@@ -251,9 +251,9 @@ def draw_kitchen(d, detail):
         d.t(208, 120, 'Pasillo 1,10', size=0.85, anchor='start')
         d.t(205, 84, 'Mesón granito · fondo 60', size=0.85)
         fs = 0.74
-        d.t(275, 162, 'Gabinete', size=fs)
-        d.t(320, 162, 'Lavadero', size=fs)
-        d.t(375, 162, 'Lavadora', size=fs)
+        d.t(285, 162, 'Lavadora', size=fs)
+        d.t(340, 162, 'Lavadero', size=fs)
+        d.t(385, 162, 'Gabinete', size=fs)
         d.t(330, 142, 'Ropas', size=0.9)
         # cotas de módulos
         y = -T - 0.9 * d.fs
@@ -269,9 +269,9 @@ def draw_kitchen(d, detail):
         d.dimv(60, 170, xr, '1,10', size=0.82, right=True)
         d.dimv(170, 230, xr, '60', size=0.82, right=True)
         yb = h + T + 0.9 * d.fs
-        d.dimh(255, 295, yb, '40', size=0.82, below=True)
-        d.dimh(295, 345, yb, '50', size=0.82, below=True)
-        d.dimh(345, 405, yb, '60', size=0.82, below=True)
+        d.dimh(255, 315, yb, '60', size=0.82, below=True)
+        d.dimh(315, 365, yb, '50', size=0.82, below=True)
+        d.dimh(365, 405, yb, '40', size=0.82, below=True)
     else:
         top_left_dims(d, w, h)
 
@@ -505,26 +505,26 @@ def laundry_elev():
     tw = d.pat('tw', 60, 30, 'm-tw', 'j-tw', 0, Y(120))
     d.a('<rect x="0" y="0" width="180" height="240" class="m-paint"/>')
     d.a(f'<rect x="0" y="{Y(120)}" width="150" height="120" fill="{tw}" class="eo"/>')
-    # lavadora propia
-    d.a(f'<rect x="2" y="{Y(85)}" width="56" height="85" rx="3" class="own-e"/><circle cx="30" cy="{Y(48)}" r="17" class="own-e"/>')
-    d.a(f'<circle cx="30" cy="{Y(100)}" r="2.6" class="metal"/>')
+    # gabinete alto de limpieza, junto a la ventana
+    d.a(f'<rect x="0" y="{Y(10)}" width="40" height="10" class="zoc eo"/>'
+        f'<rect x="0.4" y="{Y(205)}" width="39.2" height="195" class="m-lower eo"/><path d="M0 {Y(110)}H40" class="eo"/>')
+    d.a(f'<g class="only-a"><path d="M4 {Y(125)}V{Y(140)}M4 {Y(95)}V{Y(80)}" class="hdl"/></g>')
+    d.a(f'<g class="only-b"><rect x="0.4" y="{Y(205)}" width="39.2" height="1.6" class="gola"/></g>')
     # lavadero compacto
-    d.a(f'<rect x="62" y="{Y(90)}" width="46" height="32" rx="2" class="lav eo"/><path d="M66 {Y(58)}V0M104 {Y(58)}V0" class="eo"/>'
-        f'<path d="M85 {Y(90)}V{Y(104)}Q85 {Y(110)} 91 {Y(110)}H93" class="faucet"/>')
-    # gabinete alto
-    d.a(f'<rect x="110" y="{Y(10)}" width="40" height="10" class="zoc eo"/>'
-        f'<rect x="110.4" y="{Y(205)}" width="39.2" height="195" class="m-lower eo"/><path d="M110 {Y(110)}H150" class="eo"/>')
-    d.a(f'<g class="only-a"><path d="M146 {Y(125)}V{Y(140)}M146 {Y(95)}V{Y(80)}" class="hdl"/></g>')
-    d.a(f'<g class="only-b"><path d="M146 {Y(125)}V{Y(140)}M146 {Y(95)}V{Y(80)}" class="hdl"/></g>')
+    d.a(f'<rect x="42" y="{Y(90)}" width="46" height="32" rx="2" class="lav eo"/><path d="M46 {Y(58)}V240M84 {Y(58)}V240" class="eo"/>'
+        f'<path d="M65 {Y(90)}V{Y(104)}Q65 {Y(110)} 71 {Y(110)}H73" class="faucet"/>')
+    # lavadora propia
+    d.a(f'<rect x="92" y="{Y(85)}" width="56" height="85" rx="3" class="own-e"/><circle cx="120" cy="{Y(48)}" r="17" class="own-e"/>')
+    d.a(f'<circle cx="120" cy="{Y(100)}" r="2.6" class="metal"/>')
     d.a(f'<rect x="{-T}" y="0" width="{T}" height="240" class="pc"/>'
         f'<rect x="{-T}" y="240" width="{190 + T}" height="{T}" class="pc"/><rect x="{-T}" y="{-T}" width="{190 + T}" height="{T}" class="pc"/>'
         f'<path d="M180 {-T}L184 60L176 120L184 180L180 {240 + T}" class="brk"/>')
     yb = 240 + T + 1.5 * d.fs
-    for x0, wd, nm in ((0, 60, 'Lavadora'), (60, 50, 'Lavadero'), (110, 40, 'Gabinete')):
+    for x0, wd, nm in ((0, 40, 'Gabinete'), (40, 50, 'Lavadero'), (90, 60, 'Lavadora')):
         d.dimh(x0, x0 + wd, yb, str(wd), size=0.85)
         d.t(x0 + wd / 2, yb + d.fs * 1.15, nm, cls='dn', size=0.78)
     d.dimv(240, 120, -T - 0.9 * d.fs, 'enchape 1,20', size=0.8)
-    return d.svg('Vista del muro de ropas: lavadora, lavadero compacto y gabinete alto de limpieza, con enchape de 1,20 m de alto.')
+    return d.svg('Vista del muro de ropas: gabinete alto de limpieza junto a la ventana, lavadero compacto y lavadora, con enchape de 1,20 m de alto.')
 
 
 def bath_elev():
@@ -686,6 +686,90 @@ LEG_PLAN = ('<div class="legend">'
             '<span class="key"><span class="sw lt-k"></span>Luz de techo</span>'
             '</div>')
 
+
+# ---------------------------------------------------------------- renders y muestras
+def img_ab(name, alt_a, alt_b, w=1600, h=1000, eager=False, prefix=''):
+    la = '' if eager else ' loading="lazy"'
+    return (f'<img class="only-a" src="img/{prefix}{name}-a.jpg" width="{w}" height="{h}" alt="{esc(alt_a)}"{la} decoding="async">'
+            f'<img class="only-b" src="img/{prefix}{name}-b.jpg" width="{w}" height="{h}" alt="{esc(alt_b)}" loading="lazy" decoding="async">')
+
+
+def shot(name, alt_a, alt_b, cap):
+    return (f'<figure class="shot"><div class="shot-img">{img_ab(name, alt_a, alt_b)}'
+            f'<span class="shot-tag"><span class="optchip a only-a">A</span><span class="optchip b only-b">B</span>Render ilustrativo</span></div>'
+            f'<figcaption>{cap}</figcaption></figure>')
+
+
+RENDER_NOTE = ('<p class="disc">Renders generados por computador con las medidas y los materiales de la propuesta. '
+               'Muebles sueltos, nevera y lavadora son de referencia, la ubicación de ventanas es supuesta y los colores son aproximados.</p>')
+
+ALT = {
+    'cocina': ('Render de la cocina en la opción A: altos blanco mate, bajos taupe con manijas negras, mesón de granito negro y piso SPC roble claro.',
+               'Render de la cocina en la opción B: altos blanco cálido, bajos gris piedra con perfil de aluminio, torre de despensa y piso SPC roble natural.'),
+    'ropas': ('Render de la zona de ropas en la opción A, vista desde el lavaplatos: piso cerámico, lavadora, lavadero y gabinete alto junto a la ventana.',
+              'Render de la zona de ropas en la opción B, vista desde el lavaplatos, con gabinete gris piedra y piso cerámico gris.'),
+    'sala': ('Render de la sala-comedor en la opción A: mesa redonda, sofá de dos puestos, panel de TV y puerta-ventana al balcón.',
+             'Render de la sala-comedor en la opción B, con piso roble natural y dos luces de techo.'),
+    'bano': ('Render del baño en la opción A: enchape claro, mueble flotante taupe, grifería negro mate y división de vidrio.',
+             'Render del baño en la opción B: mueble en roble natural y grifería inoxidable.'),
+    'alcoba': ('Render de la alcoba principal en la opción A: closet piso-techo blanco con cinco puertas y manijas negras.',
+               'Render de la alcoba principal en la opción B: closet piso-techo en roble natural con rejillas de ventilación.'),
+}
+
+MATROWS = [
+    ('Piso de zonas secas', 'Alcobas, sala-comedor y cocina',
+     ('spc-a', 'SPC roble claro', 'Con zócalos y perfiles de transición.'),
+     ('spc-b', 'SPC roble natural', 'Mayor capa de uso y base acústica IXPE.')),
+    ('Muros y techos', 'Todo el apartamento',
+     ('paint', 'Blanco cálido', 'Estuco y pintura lavable.'),
+     ('paint', 'Blanco cálido', 'Pintura lavable de mejor gama.')),
+    ('Muebles altos de cocina', 'Fondo 30–35 cm, alto 70–80 cm',
+     ('upper-a', 'Melamina RH blanco mate', 'Bisagras de cierre suave.'),
+     ('upper-b', 'Melamina RH blanco cálido', 'Herrajes de marca con garantía.')),
+    ('Muebles bajos', 'Cocina y gabinete de ropas',
+     ('lower-a', 'Melamina RH taupe / moca claro', 'También el mueble de baño.'),
+     ('lower-b', 'Melamina RH gris piedra suave', 'Cantos de 2 mm en frentes.')),
+    ('Closets', 'Tres alcobas y, en B, mueble de baño',
+     ('upper-a', 'Melamina RH blanco cálido', 'Color sugerido.'),
+     ('clo-b', 'Melamina RH roble natural', 'Color sugerido, también en el mueble de baño.')),
+    ('Mesón de cocina', '2 cm, sellado y con borde pulido',
+     ('ctr-a', 'Granito Negro San Gabriel', 'Pulido, con silicona neutra antihongos.'),
+     ('ctr-b', 'Granito de primera o superficie compacta', 'Con ficha técnica y sellado documentado.')),
+    ('Salpicadero', 'Del mesón a los muebles altos',
+     ('sp-a', 'Cerámica blanca 30 × 60', 'La propuesta admite blanca o marmolizada.'),
+     ('sp-b', 'Cerámica marmolizada 30 × 60', 'La propuesta admite blanca o marmolizada.')),
+    ('Piso de baños, ropas y balcón', 'Cerámica antideslizante',
+     ('tf-a', 'Cerámica 30 × 30 gris cálido', 'Tono sugerido.'),
+     ('tf-b', 'Cerámica 30 × 30 gris piedra', 'Tono sugerido.')),
+    ('Muros de baños', 'Y enchape de ropas a 1,20 m',
+     ('tw-a', 'Cerámica clara 30 × 60', 'Impermeabilización debajo.'),
+     ('tw-b', 'Cerámica clara 30 × 60', 'Impermeabilización con prueba y acta.')),
+    ('Herrajes y grifería', 'Manijas, barras y griferías',
+     ('metal-a', 'Negro mate', 'Manijas, grifería y barras de closet.'),
+     ('metal-b', 'Inoxidable y perfil de aluminio', 'Cocina con perfil tipo gola, sin manijas.')),
+]
+
+
+def mcard(opt, spec):
+    sid, name, note_ = spec
+    return (f'<figure class="mcard {opt}"><img src="img/m-{sid}.jpg" width="640" height="480" alt="Muestra: {esc(name)}" loading="lazy" decoding="async">'
+            f'<figcaption><span class="mname"><span class="optchip {opt}">{opt.upper()}</span><b>{name}</b></span><small>{note_}</small></figcaption></figure>')
+
+
+mat_rows_html = ''.join(
+    f'<div class="mrow"><div class="mhead"><h3>{t}</h3><p>{w}</p></div>{mcard("a", a)}{mcard("b", b)}</div>'
+    for t, w, a, b in MATROWS)
+
+GALLERY = f'''
+<div class="gal">
+  <button type="button" class="gal-main" data-go="sala">{img_ab('sala', *ALT['sala'], eager=True)}<span class="gal-cap">Sala-comedor y balcón</span></button>
+  <div class="gal-grid">
+    <button type="button" class="gal-t" data-go="cocina">{img_ab('cocina', *ALT['cocina'], w=640, h=400, prefix='t-')}<span class="gal-cap">Cocina</span></button>
+    <button type="button" class="gal-t" data-go="cocina">{img_ab('ropas', *ALT['ropas'], w=640, h=400, prefix='t-')}<span class="gal-cap">Ropas</span></button>
+    <button type="button" class="gal-t" data-go="banos">{img_ab('bano', *ALT['bano'], w=640, h=400, prefix='t-')}<span class="gal-cap">Baño</span></button>
+    <button type="button" class="gal-t" data-go="alcobas">{img_ab('alcoba', *ALT['alcoba'], w=640, h=400, prefix='t-')}<span class="gal-cap">Alcoba principal</span></button>
+  </div>
+</div>'''
 
 # ---------------------------------------------------------------- dibujos
 K_SHEET, FS_SHEET = 0.62, 10.5
@@ -1037,7 +1121,7 @@ footer{padding-block:28px 46px;color:var(--muted);font-size:.84rem;border-top:1p
 CSS = CSS.replace('MATA', mat_css(MAT_A)).replace('MATC', mat_css(MAT_C)).replace('MATB', mat_css(MAT_B))
 
 # ---------------------------------------------------------------- contenido
-TABS = [('resumen', 'Resumen'), ('planta', 'Planta'), ('cocina', 'Cocina y ropas'), ('banos', 'Baños'),
+TABS = [('resumen', 'Resumen'), ('materiales', 'Materiales'), ('planta', 'Planta'), ('cocina', 'Cocina y ropas'), ('banos', 'Baños'),
         ('alcobas', 'Alcobas'), ('sala', 'Sala y balcón'), ('presupuesto', 'Presupuesto'), ('obra', 'Obra'),
         ('entrega', 'Entrega')]
 
@@ -1051,6 +1135,8 @@ V['resumen'] = f'''
 <div class="kicker">Propuesta de acabados · 29 sep 2026</div>
 <h2>Dos opciones sobre la <span class="em">misma distribución</span></h2>
 <p class="sub">La propuesta conserva la distribución del Tipo A. No hay cambios estructurales, de fachada, de ductos comunes ni de redes sin autorización. Entre A y B cambia cuánto se invierte en lo que no se ve: impermeabilización, herrajes, circuitos y garantías.</p>
+{GALLERY}
+<p class="disc">Renders ilustrativos de la opción <span class="only-a">A</span><span class="only-b">B</span>. Cambia de opción arriba para ver la otra, o toca una imagen para ir a ese espacio.</p>
 
 <div class="opts">
   <div class="oc" data-opt-card="a">
@@ -1098,6 +1184,17 @@ V['resumen'] = f'''
 {note('', '!', '<b>Aviso de precisión.</b> Las vistas y la propuesta son conceptuales. El plano comercial da medidas aproximadas: no se debe fabricar carpintería, cortar piedra ni mover redes sin medir el apartamento en obra gris.')}
 '''
 
+V['materiales'] = f'''
+<div class="kicker">Materiales · muestras generadas por computador</div>
+<h2>Los materiales de A y B, uno al lado del otro</h2>
+<p class="sub">Cada fila es un elemento del apartamento con el material de cada opción. La opción seleccionada se resalta. Los colores en pantalla son aproximados: pide muestras físicas y fichas técnicas antes de comprar.</p>
+<div class="mgrid">
+<div class="mrow mlabels"><div></div><div><span class="optchip a">A</span> Optimizada</div><div><span class="optchip b">B</span> Mejorada</div></div>
+{mat_rows_html}
+</div>
+{note('blue', 'i', '<b>Qué define la propuesta y qué es sugerencia.</b> La propuesta fija la paleta de cada opción, el SPC, el granito, los formatos cerámicos y los herrajes. El tono exacto de las cerámicas de piso y el color de closets y mueble de baño en B son sugerencias dentro de esa paleta.')}
+'''
+
 V['planta'] = f'''
 <div class="kicker">Planta · 44,30 m² privados · altura libre 2,40 m</div>
 <h2>Cada espacio a la misma escala</h2>
@@ -1133,6 +1230,11 @@ V['cocina'] = f'''
 <div class="kicker">Cocina y ropas · 4,05 × 2,30 m</div>
 <h2>Cocina lineal sobre un muro, <span class="em">sin península</span></h2>
 <p class="sub">Se elimina la península de 1,50 × 0,90 m para dejar un pasillo de 90 a 110 cm. En este esquema la zona de ropas va en el muro de enfrente, que es lo que deja el pasillo en 1,10 m. Confirma la posición real de los puntos de agua y gas antes de diseñar.</p>
+<div class="shots2">
+{shot('cocina', *ALT['cocina'], '<b>Cocina.</b> Mesón en granito, salpicadero 30 × 60 y altos a 55–60 cm del mesón. <span class="only-a">Manijas negro mate.</span><span class="only-b">Perfil de aluminio sin manijas y torre de despensa al fondo.</span>')}
+{shot('ropas', *ALT['ropas'], '<b>Cocina y ropas</b> desde el lavaplatos: cerámica con perfil de transición, lavadora, lavadero y gabinete junto a la ventana.')}
+</div>
+{RENDER_NOTE}
 <div class="figs">
   {fig(KE, '<b>Vista frontal del muro de cocina.</b> Mesón a ≈90 cm, altos a 55–60 cm del mesón y tira LED 3.000 K debajo. <span class="only-b">En B, la torre de despensa (punteada) solo va si la medida conserva pasillo y ventilación de la nevera.</span>', 'panel')}
 </div>
@@ -1140,7 +1242,7 @@ V['cocina'] = f'''
 {note('blue', 'i', '<b>Los módulos no llenan el mueble.</b> Nevera, lavaplatos, cajonero, estufa y remate suman 2,50–2,90 m, y el mueble lineal previsto mide 3,20–3,60 m. En el dibujo esa diferencia va en un módulo de ajuste de 50 cm. Defínelo con la medida láser antes del despiece.')}
 <div class="figs">
   {fig(kitchen_plan, '<b>Planta.</b> Los altos se marcan punteados sobre el mesón. La línea café punteada es la transición de SPC a cerámica en ropas.', 'panel')}
-  {fig(RE, '<b>Muro de ropas</b>, visto desde la cocina. Enchape de 1,20 m, lavadero compacto y gabinete alto de limpieza.', 'panel')}
+  {fig(RE, '<b>Muro de ropas</b>, visto desde la cocina. Gabinete alto junto a la ventana, lavadero compacto y lavadora, con enchape de 1,20 m.', 'panel')}
 </div>
 <div class="block"><h3>Especificación · Opción A</h3>
 {spec_table([
@@ -1171,6 +1273,8 @@ V['banos'] = f'''
 <div class="kicker">Baños · 2 × (1,10 × 2,10 m)</div>
 <h2>Dos baños completos con la misma disposición</h2>
 <p class="sub">En este esquema el mueble, el sanitario y la ducha van sobre el muro largo, con la ducha al fondo detrás de una división corrediza en vidrio templado de 8 mm. Verifica la posición del desagüe del sanitario y del sifón de la ducha en obra.</p>
+{shot('bano', *ALT['bano'], '<b>Baño</b> visto desde la puerta. Enchape claro 30 × 60, piso antideslizante, mueble flotante con espejo y luz, y división corrediza. <span class="only-a">Grifería negro mate.</span><span class="only-b">Grifería inoxidable y mueble en roble natural.</span>')}
+{RENDER_NOTE}
 <div class="figs">
   {fig(bath_plan, '<b>Planta.</b> Piso cerámico antideslizante 30 × 30.', 'panel')}
   {fig(BE, '<b>Muro largo.</b> Enchape claro 30 × 60, mueble flotante RH de 60 cm, espejo con luz frontal.', 'panel')}
@@ -1199,6 +1303,8 @@ V['alcobas'] = f'''
 <div class="kicker">Alcobas · closets en melamina RH</div>
 <h2>Closets ajustados a la cama y a la circulación</h2>
 <p class="sub">Los closets van contra un muro corto con puertas batientes piso-techo cuando la apertura lo permite; si no, corredizas. Las camas se dibujan solo como referencia de espacio y no hacen parte del presupuesto.</p>
+{shot('alcoba', *ALT['alcoba'], '<b>Alcoba principal.</b> Closet piso-techo de 2,50 m con cinco puertas. <span class="only-a">Melamina blanco cálido y manijas negro mate.</span><span class="only-b">Melamina roble natural, perfil de aluminio y rejillas de ventilación.</span>')}
+{RENDER_NOTE}
 <div class="figs panel">
   {fig(master_plan, '<b>Alcoba principal</b> · 2,50 × 3,38 m. Cama doble 1,40 y 88 cm libres frente al closet.')}
   {fig(bed2_plan, '<b>Alcoba 2</b> · 2,30 × 2,80 m. Cama 1,20 y closet de 1,60 m.')}
@@ -1225,6 +1331,8 @@ V['sala'] = f'''
 <div class="kicker">Sala-comedor 2,65 × 3,40 m · balcón 2,00 × 0,72 m</div>
 <h2>Zona social liviana, sin muebles sobredimensionados</h2>
 <p class="sub">Mesa redonda compacta para cuatro en vez de barra dentro de la cocina, sofá de dos puestos y panel de TV liviano. <span class="only-a">Una luz central.</span><span class="only-b">En B la luz se separa en dos escenas: comedor y sala.</span></p>
+{shot('sala', *ALT['sala'], '<b>Sala-comedor</b> hacia el balcón. Mesa redonda para 4, sofá de 2 puestos y panel de TV. <span class="only-b">Dos luces de techo, una por escena.</span>')}
+{RENDER_NOTE}
 <div class="figs">
   {fig(living_plan, '<b>Planta.</b> El balcón conserva su baranda y fachada; solo se interviene piso, sellos, luz y pintura.', 'panel')}
   <div class="card" style="flex:1 1 280px;min-width:0"><h3>Especificación · Opción A</h3><ul>
@@ -1428,6 +1536,40 @@ page = f'''<title>Obra Blanca Apto 901</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>{CSS}
+.shot{{margin:22px 0 0}}
+.shot-img{{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow)}}
+.shot-img img{{display:block;width:100%;height:auto}}
+.shot-tag{{position:absolute;left:12px;top:12px;display:inline-flex;align-items:center;gap:7px;padding:5px 10px 5px 6px;border-radius:999px;background:var(--card);color:var(--ink);font:600 .72rem/1 var(--f-body);box-shadow:var(--shadow)}}
+.shot figcaption{{font-size:.84rem;color:var(--muted);margin-top:9px;max-width:80ch}}
+.shot figcaption b{{color:var(--ink);font-weight:600}}
+.shots2{{display:grid;grid-template-columns:1fr 1fr;gap:16px}}
+.shots2 > *{{min-width:0}}
+@media(max-width:760px){{.shots2{{grid-template-columns:1fr}}}}
+.gal{{display:grid;gap:10px;margin-top:22px}}
+.gal button{{appearance:none;border:0;padding:0;background:var(--card);position:relative;cursor:pointer;border-radius:12px;overflow:hidden;display:block;width:100%;box-shadow:var(--shadow)}}
+.gal img{{display:block;width:100%;height:auto;transition:transform .35s ease}}
+.gal button:hover img{{transform:scale(1.02)}}
+.gal-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}}
+@media(max-width:700px){{.gal-grid{{grid-template-columns:1fr 1fr}}}}
+.gal-cap{{position:absolute;left:10px;bottom:10px;padding:4px 9px;border-radius:999px;background:var(--card);color:var(--ink);font:600 .74rem/1.2 var(--f-body);box-shadow:var(--shadow)}}
+.mgrid{{margin-top:20px}}
+.mrow{{display:grid;grid-template-columns:minmax(140px,.9fr) 1.2fr 1.2fr;gap:14px;align-items:start;padding-block:16px;border-top:1px solid var(--line)}}
+.mrow > *{{min-width:0}}
+.mlabels{{border-top:0;padding-block:0 4px;font:600 .8rem/1.2 var(--f-body);color:var(--muted)}}
+.mlabels div{{display:flex;align-items:center;gap:7px}}
+.mhead h3{{font-size:1rem;margin:2px 0 2px}}
+.mhead p{{margin:0;font-size:.82rem;color:var(--muted)}}
+.mcard{{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card);transition:opacity .2s,box-shadow .2s,border-color .2s}}
+.mcard img{{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;max-width:100%}}
+.mcard figcaption{{padding:9px 11px 11px;display:grid;gap:3px}}
+.mname{{display:flex;align-items:center;gap:7px;font-size:.88rem;line-height:1.25}}
+.mname b{{font-weight:600}}
+.mcard small{{font-size:.76rem;color:var(--muted);line-height:1.35}}
+:root:not([data-opt="b"]) .mcard.a{{border-color:var(--sA);box-shadow:0 0 0 1px var(--sA)}}
+:root[data-opt="b"] .mcard.b{{border-color:var(--sB);box-shadow:0 0 0 1px var(--sB)}}
+:root:not([data-opt="b"]) .mcard.b,:root[data-opt="b"] .mcard.a{{opacity:.7}}
+@media(max-width:620px){{.mrow{{grid-template-columns:1fr 1fr;gap:10px}}.mhead{{grid-column:1/-1}}.mlabels div:first-child{{display:none}}}}
+@media (prefers-reduced-motion:reduce){{.gal img{{transition:none}}}}
 .linkbtn{{appearance:none;border:0;background:none;padding:0;font:inherit;color:var(--accent);text-decoration:underline;text-underline-offset:2px;cursor:pointer}}
 </style>
 <header><div class="wrap top">
