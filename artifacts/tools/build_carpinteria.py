@@ -100,19 +100,7 @@ ALTS = [
 
 resumen_rows = ''.join(f'<tr><td class="z"><a href="#{c.split()[0].lower()}">{c}</a></td><td>{t}</td><td>{w}</td></tr>' for c, t, w, q, u in ITEMS)
 
-S = []
-S.append(sec('alcance', '01 · Alcance', 'Qué se va a cotizar', f'''
-<p class="lead2">Carpintería completa del apartamento 901, Torre 1, Alto Tramonti (Girón), que hoy está en obra gris con 2,40 m de altura libre. Incluye cocina con península, tres closets, dos muebles de baño, un panel de TV y cuatro puertas interiores. Cada mueble tiene un código; úselo en la cotización.</p>
-<div class="tbl"><table><thead><tr><th>Código</th><th>Mueble</th><th>Dónde y cuánto</th></tr></thead><tbody>{resumen_rows}</tbody></table></div>
-{note('blue', 'i', '<b>Cotización preliminar.</b> Las medidas vienen del plano comercial y son aproximadas. Cotice con ellas y confirme con visita y medición láser antes de la cotización definitiva. No fabrique sin plano de despiece aprobado.')}
-'''))
-
-S.append(sec('plano', '02 · Ubicación', 'Dónde va cada mueble', f'''
-<div class="figs">{fig(TAG_PLAN, '<b>Planta del Apto 901.</b> Norte arriba, con el balcón; la entrada es por el sur. Las etiquetas naranjas son los códigos de este pliego.', 'panel')}</div>
-'''))
-
-S.append(sec('materiales', '03 · Materiales y herrajes', 'Lo que aplica a todos los muebles', f'''
-<div class="grid2">
+MAT_CARDS = '''<div class="grid2">
   <div class="card"><h3>Tableros y cantos</h3><ul>
     <li><b>Tablero:</b> aglomerado o MDP RH (resistente a la humedad) de 18 mm en cuerpos, frentes y entrepaños. Indique marca (por ejemplo Tablemac/Pelikano, Duratex o Masisa).</li>
     <li><b>Fondos:</b> 9 mm RH en cocina y baños; mínimo 6 mm en closets.</li>
@@ -127,7 +115,27 @@ S.append(sec('materiales', '03 · Materiales y herrajes', 'Lo que aplica a todos
     <li><b>Patas y zócalo:</b> patas plásticas regulables y zócalo de aluminio removible.</li>
     <li>Indique marca y referencia de cada herraje en la cotización.</li>
   </ul></div>
-</div>
+</div>'''
+CLO_CARD = '''<div class="card"><h3>Para los tres closets</h3><ul>
+  <li>Fondo total de 60 cm, del piso al techo (≈2,40 m, confirmar), sobre zócalo de 8 cm. Melamina RH roble natural.</li>
+  <li>Puertas en dos alturas: hoja de 2,00 m y puerta de maletero arriba (≈38 cm), para evitar que se pandeen. Si cotiza una sola hoja piso-techo, use 4 bisagras y enderezador de aluminio.</li>
+  <li>Perfil de aluminio vertical como tirador; rejillas de ventilación en las puertas de maletero.</li>
+  <li>Barras ovaladas de aluminio con soportes metálicos; entrepaños regulables.</li>
+</ul></div>'''
+
+S = []
+S.append(sec('alcance', '01 · Alcance', 'Qué se va a cotizar', f'''
+<p class="lead2">Carpintería completa del apartamento 901, Torre 1, Alto Tramonti (Girón), que hoy está en obra gris con 2,40 m de altura libre. Incluye cocina con península, tres closets, dos muebles de baño, un panel de TV y cuatro puertas interiores. Cada mueble tiene un código; úselo en la cotización.</p>
+<div class="tbl"><table><thead><tr><th>Código</th><th>Mueble</th><th>Dónde y cuánto</th></tr></thead><tbody>{resumen_rows}</tbody></table></div>
+{note('blue', 'i', '<b>Cotización preliminar.</b> Las medidas vienen del plano comercial y son aproximadas. Cotice con ellas y confirme con visita y medición láser antes de la cotización definitiva. No fabrique sin plano de despiece aprobado.')}
+'''))
+
+S.append(sec('plano', '02 · Ubicación', 'Dónde va cada mueble', f'''
+<div class="figs">{fig(TAG_PLAN, '<b>Planta del Apto 901.</b> Norte arriba, con el balcón; la entrada es por el sur. Las etiquetas naranjas son los códigos de este pliego.', 'panel')}</div>
+'''))
+
+S.append(sec('materiales', '03 · Materiales y herrajes', 'Lo que aplica a todos los muebles', f'''
+{MAT_CARDS}
 <h3 class="h3s">Colores</h3>
 <div class="mgrid2">
 {sample('upper-b', 'Muebles altos', 'Melamina RH blanco cálido')}
@@ -140,6 +148,70 @@ S.append(sec('materiales', '03 · Materiales y herrajes', 'Lo que aplica a todos
 <p class="disc">Muestras generadas por computador: los colores son aproximados. Traiga muestras físicas de los colores de su catálogo más cercanos.</p>
 '''))
 
+# (título, dónde, módulos, notas)
+CARP = {
+    'COC-01': ('Mueble bajo del muro sur', 'Entre la puerta de entrada y ropas · alto total 90 cm con mesón, fondo 60 cm', [
+    ('Lavaplatos', '60 × 78 × 58', '2 puertas; bandeja antiderrame de aluminio; caneca de reciclaje extraíble de 2 compartimentos; fondo RH 9 mm; perforaciones para desagüe y llaves con el sifón accesible.'),
+    ('Cajonero', '60 × 78 × 58', '3 cajones de caja metálica (≈16, 26 y 36 cm); organizador de cubiertos en el primero; el inferior para ollas, carga reforzada.'),
+    ('Estufa y horno', '60 × 78 × 58', 'Hueco para horno empotrado de 60 cm con ventilación, según el modelo que se compre; cajón inferior de 16 cm; soporte para la cubierta a gas de 4 puestos.'),
+    ('Remate', '23 × 78 × 58', 'Especiero o botellero extraíble de 20 cm con herraje de marca.'),
+    ('Zócalo', '203 × 10', 'Aluminio removible sobre patas regulables.'),
+], ['El lavaplatos y la estufa quedan donde Inacar deja el desagüe y el gas: no se mueven redes.', 'Espacios de 60 cm para la lavadora y de 50 cm para el lavadero bajo la ventana de ropas (no llevan mueble bajo).']),
+    'COC-02': ('Muebles altos del muro sur', 'Desde el lavaplatos hasta la lavadora · a 1,47 m del piso, fondo 33 cm, alto 75 cm', [
+    ('Sobre lavaplatos', '60 × 75 × 33', '2 puertas; escurreplatos interno con bandeja recogegotas.'),
+    ('Sobre cajonero', '60 × 75 × 33', '2 puertas y 1 entrepaño regulable.'),
+    ('Sobre estufa', '60 × 42 × 33', 'Alacena corta sobre la campana. Respetar la distancia a la cubierta que pida el fabricante de la campana (suministro aparte).'),
+    ('Sobre remate y lavadora', '83 × 75 × 33', '2 puertas y 1 entrepaño; guarda detergentes de ropas.'),
+    ('Iluminación', '263 lineales', 'Perfil de aluminio para tira LED bajo los altos, con paso de cable oculto. El electricista instala la luz.'),
+]),
+    'COC-03': ('Frente norte: módulo bajo y torre', 'Contra el muro de la alcoba principal, frente al mesón', [
+    ('Módulo bajo', '30 × 78 × 58', 'Bandejero vertical con divisores para tablas y bandejas; mesón encima, continuo con la península.'),
+    ('Hueco de nevera', '70 de ancho', 'Sin mueble. Dejar 5 cm de ventilación a los lados y arriba; confirmar con el modelo de nevera.'),
+    ('Torre', '40 × 222 × 60', '3 puertas. Arriba despensa con entrepaños regulables; abajo zona de aseo de 1,20 m de alto con ganchos para escoba y trapero.'),
+]),
+    'COC-04': ('Península con frente en WPC', 'Límite entre cocina y sala, unida al módulo bajo de COC-03', [
+    ('Cuerpo', '150 × 78 × 60', 'Sobre zócalo retrocedido de 10 cm. Hacia la cocina: puerta de 50, cajonero de 50 con 3 cajones de caja metálica y puerta de 50.'),
+    ('Frente y costado', '150 + 60 × 78', 'Panel WPC acanalado de interior, color roble natural, con fijación oculta, hacia la sala y en el costado occidental.'),
+    ('Voladizo', '100 × 30', 'Solo en el tramo de los bancos, para no estorbar la puerta de la alcoba principal (lo da el mesón, COC-05).'),
+    ('Toma', '—', 'Perforación para toma doble en el costado hacia la cocina (la instala el electricista).'),
+], ['Anclar el cuerpo al piso y al módulo bajo de COC-03.', 'Si prefiere más espacio para las rodillas: cuerpo de 55 cm y voladizo de 35 cm, con el mismo total de 90 cm. Indique si cambia el precio.', 'Los bancos no se incluyen.']),
+    'COC-05': ('Mesones (si los suministran)', 'Si no los suministran, indíquelo: se cotizan con marmolería', [
+    ('Muro sur', '203 × 63,5 × 2', 'Granito de primera o superficie compacta con ficha técnica; recortes para lavaplatos y cubierta; borde pulido y sellado; silicona neutra antihongos.'),
+    ('Península y módulo', '100 × 94 + 80 × 64', 'Una pieza en L: 100 × 94 cm en el tramo con voladizo y 80 × 64 cm en el resto de la península y el módulo de 30.'),
+    ('Salpicadero', '—', 'No es de carpintería: cerámica 30 × 60 que coloca el enchapador.'),
+]),
+    'CLO-01': ('Closet alcoba principal', 'Muro norte, junto a la ventana · 150 × 240 × 60', [
+    ('Cuerpo 1', '50', 'Doble colgado con barras a 1,96 y 1,06 m.'),
+    ('Cuerpo 2', '50', '4 cajones con correderas ocultas y 2 entrepaños arriba.'),
+    ('Cuerpo 3', '50', 'Zapatero con 3 entrepaños abajo y colgado medio arriba.'),
+    ('Maletero', '150 × 35', 'Corrido arriba, con puertas y rejillas.'),
+    ('Puertas', '3 × 50', 'Batientes en dos alturas.'),
+]),
+    'CLO-02': ('Closet alcoba 2', 'Muro sur, junto a la puerta · 145 × 240 × 60', [
+    ('Cuerpo 1', '48', 'Colgado largo.'),
+    ('Cuerpo 2', '48', '3 cajones y entrepaños.'),
+    ('Cuerpo 3', '48', 'Doble colgado.'),
+    ('Maletero', '145 × 35', 'Corrido arriba.'),
+    ('Puertas', '3 × 48', 'Batientes en dos alturas.'),
+]),
+    'CLO-03': ('Closet alcoba 3, corredizo', 'Muro oriental · 120 × 240 × 60', [
+    ('Cuerpo 1', '60', 'Colgado con entrepaño arriba.'),
+    ('Cuerpo 2', '60', '2 cajones y entrepaños.'),
+    ('Maletero', '120 × 35', 'Con puertas abatibles o corredizas.'),
+    ('Puertas', '2 × 60', 'Corredizas con marco de aluminio y panel de melamina de 9 mm, riel superior e inferior.'),
+], ['Con cama de 0,90 m quedan 50 cm de paso frente al closet; por eso las puertas son corredizas.']),
+    'BAN-01': ('Mueble flotante baño principal', 'Muro oriental, junto a la puerta', [
+    ('Mueble', '60 × 38 × 45', 'Melamina RH roble natural con cantos en cola PUR; 1 puerta o cajón con recorte para el sifón; anclaje oculto al muro, a 47 cm del piso.'),
+], ['El lavamanos o la cubierta con lavamanos se suministra aparte; confirme medidas antes de fabricar.']),
+    'BAN-02': ('Mueble flotante baño auxiliar', 'Igual a BAN-01', [
+    ('Mueble', '60 × 38 × 45', 'Igual a BAN-01. El baño auxiliar ya viene terminado: cotícelo aparte porque puede que no se haga.'),
+]),
+    'SAL-01': ('Panel de TV y repisa flotante', 'Muro occidental de la sala, frente al sofá', [
+    ('Panel', '120 × 100 × 3', 'Melamina roble natural, fijo al muro entre 0,95 y 1,95 m, con paso de cables oculto.'),
+    ('Repisa', '110 × 18 × 32', 'Flotante, a 36 cm del piso, con soportes ocultos.'),
+], ['El soporte del TV va anclado al muro, no al panel.']),
+}
+
 COC = f'''
 <div class="shots2">
 {shot(img64('cocina-b.jpg'), 'Render de la cocina desde la sala con la península, dos bancos y el mueble sobre el muro sur.', '<b>Desde la sala.</b> Península con frente en WPC y, al fondo, el mueble del muro sur.')}
@@ -148,36 +220,11 @@ COC = f'''
 <div class="figs">{fig(B.PLAN_COCINA, '<b>Planta de la cocina.</b> Mesón de 60 cm sobre el muro sur, pasillo de 1,10 m y península hacia la sala. La nevera y la lavadora son del propietario.', 'panel')}</div>
 <div class="figs">{fig(B.KE, '<b>Muro sur visto desde la cocina.</b> COC-01 abajo y COC-02 arriba. Lavaplatos y estufa van donde están el desagüe y el gas actuales.', 'panel')}</div>
 <div class="figs">{fig(B.PE, '<b>Península (COC-04).</b> Hacia la sala, frente en WPC; en corte, cuerpo de 60 cm y voladizo de 30 cm a 90 cm de altura; hacia la cocina, puerta, cajonero y puerta.', 'panel')}</div>
-{item('COC-01', 'Mueble bajo del muro sur', 'Entre la puerta de entrada y ropas · alto total 90 cm con mesón, fondo 60 cm', [
-    ('Lavaplatos', '60 × 78 × 58', '2 puertas; bandeja antiderrame de aluminio; caneca de reciclaje extraíble de 2 compartimentos; fondo RH 9 mm; perforaciones para desagüe y llaves con el sifón accesible.'),
-    ('Cajonero', '60 × 78 × 58', '3 cajones de caja metálica (≈16, 26 y 36 cm); organizador de cubiertos en el primero; el inferior para ollas, carga reforzada.'),
-    ('Estufa y horno', '60 × 78 × 58', 'Hueco para horno empotrado de 60 cm con ventilación, según el modelo que se compre; cajón inferior de 16 cm; soporte para la cubierta a gas de 4 puestos.'),
-    ('Remate', '23 × 78 × 58', 'Especiero o botellero extraíble de 20 cm con herraje de marca.'),
-    ('Zócalo', '203 × 10', 'Aluminio removible sobre patas regulables.'),
-], ['El lavaplatos y la estufa quedan donde Inacar deja el desagüe y el gas: no se mueven redes.', 'Espacios de 60 cm para la lavadora y de 50 cm para el lavadero bajo la ventana de ropas (no llevan mueble bajo).'])}
-{item('COC-02', 'Muebles altos del muro sur', 'Desde el lavaplatos hasta la lavadora · a 1,47 m del piso, fondo 33 cm, alto 75 cm', [
-    ('Sobre lavaplatos', '60 × 75 × 33', '2 puertas; escurreplatos interno con bandeja recogegotas.'),
-    ('Sobre cajonero', '60 × 75 × 33', '2 puertas y 1 entrepaño regulable.'),
-    ('Sobre estufa', '60 × 42 × 33', 'Alacena corta sobre la campana. Respetar la distancia a la cubierta que pida el fabricante de la campana (suministro aparte).'),
-    ('Sobre remate y lavadora', '83 × 75 × 33', '2 puertas y 1 entrepaño; guarda detergentes de ropas.'),
-    ('Iluminación', '263 lineales', 'Perfil de aluminio para tira LED bajo los altos, con paso de cable oculto. El electricista instala la luz.'),
-])}
-{item('COC-03', 'Frente norte: módulo bajo y torre', 'Contra el muro de la alcoba principal, frente al mesón', [
-    ('Módulo bajo', '30 × 78 × 58', 'Bandejero vertical con divisores para tablas y bandejas; mesón encima, continuo con la península.'),
-    ('Hueco de nevera', '70 de ancho', 'Sin mueble. Dejar 5 cm de ventilación a los lados y arriba; confirmar con el modelo de nevera.'),
-    ('Torre', '40 × 222 × 60', '3 puertas. Arriba despensa con entrepaños regulables; abajo zona de aseo de 1,20 m de alto con ganchos para escoba y trapero.'),
-])}
-{item('COC-04', 'Península con frente en WPC', 'Límite entre cocina y sala, unida al módulo bajo de COC-03', [
-    ('Cuerpo', '150 × 78 × 60', 'Sobre zócalo retrocedido de 10 cm. Hacia la cocina: puerta de 50, cajonero de 50 con 3 cajones de caja metálica y puerta de 50.'),
-    ('Frente y costado', '150 + 60 × 78', 'Panel WPC acanalado de interior, color roble natural, con fijación oculta, hacia la sala y en el costado occidental.'),
-    ('Voladizo', '100 × 30', 'Solo en el tramo de los bancos, para no estorbar la puerta de la alcoba principal (lo da el mesón, COC-05).'),
-    ('Toma', '—', 'Perforación para toma doble en el costado hacia la cocina (la instala el electricista).'),
-], ['Anclar el cuerpo al piso y al módulo bajo de COC-03.', 'Si prefiere más espacio para las rodillas: cuerpo de 55 cm y voladizo de 35 cm, con el mismo total de 90 cm. Indique si cambia el precio.', 'Los bancos no se incluyen.'])}
-{item('COC-05', 'Mesones (si los suministran)', 'Si no los suministran, indíquelo: se cotizan con marmolería', [
-    ('Muro sur', '203 × 63,5 × 2', 'Granito de primera o superficie compacta con ficha técnica; recortes para lavaplatos y cubierta; borde pulido y sellado; silicona neutra antihongos.'),
-    ('Península y módulo', '100 × 94 + 80 × 64', 'Una pieza en L: 100 × 94 cm en el tramo con voladizo y 80 × 64 cm en el resto de la península y el módulo de 30.'),
-    ('Salpicadero', '—', 'No es de carpintería: cerámica 30 × 60 que coloca el enchapador.'),
-])}
+{item('COC-01', *CARP['COC-01'])}
+{item('COC-02', *CARP['COC-02'])}
+{item('COC-03', *CARP['COC-03'])}
+{item('COC-04', *CARP['COC-04'])}
+{item('COC-05', *CARP['COC-05'])}
 '''
 S.append(sec('cocina', '04 · Cocina y península', 'COC-01 a COC-05', COC,
              'La cocina se abre a la sala. El mueble del muro sur mide 2,03 m entre la puerta de entrada y ropas; al frente van el módulo bajo, la nevera y la torre, y hacia la sala la península.'))
@@ -190,48 +237,19 @@ CLO = f'''
   {fig(B.PLAN_A3, '<b>Alcoba 3.</b> Closet corredizo de 1,20 m.')}
 </div>
 <div class="figs">{fig(B.CE, '<b>Interior de CLO-01</b>, sin puertas: doble colgado, cajones, zapatero con colgado medio y maletero con rejillas.', 'panel')}</div>
-<div class="card"><h3>Para los tres closets</h3><ul>
-  <li>Fondo total de 60 cm, del piso al techo (≈2,40 m, confirmar), sobre zócalo de 8 cm. Melamina RH roble natural.</li>
-  <li>Puertas en dos alturas: hoja de 2,00 m y puerta de maletero arriba (≈38 cm), para evitar que se pandeen. Si cotiza una sola hoja piso-techo, use 4 bisagras y enderezador de aluminio.</li>
-  <li>Perfil de aluminio vertical como tirador; rejillas de ventilación en las puertas de maletero.</li>
-  <li>Barras ovaladas de aluminio con soportes metálicos; entrepaños regulables.</li>
-</ul></div>
-{item('CLO-01', 'Closet alcoba principal', 'Muro norte, junto a la ventana · 150 × 240 × 60', [
-    ('Cuerpo 1', '50', 'Doble colgado con barras a 1,96 y 1,06 m.'),
-    ('Cuerpo 2', '50', '4 cajones con correderas ocultas y 2 entrepaños arriba.'),
-    ('Cuerpo 3', '50', 'Zapatero con 3 entrepaños abajo y colgado medio arriba.'),
-    ('Maletero', '150 × 35', 'Corrido arriba, con puertas y rejillas.'),
-    ('Puertas', '3 × 50', 'Batientes en dos alturas.'),
-])}
-{item('CLO-02', 'Closet alcoba 2', 'Muro sur, junto a la puerta · 145 × 240 × 60', [
-    ('Cuerpo 1', '48', 'Colgado largo.'),
-    ('Cuerpo 2', '48', '3 cajones y entrepaños.'),
-    ('Cuerpo 3', '48', 'Doble colgado.'),
-    ('Maletero', '145 × 35', 'Corrido arriba.'),
-    ('Puertas', '3 × 48', 'Batientes en dos alturas.'),
-])}
-{item('CLO-03', 'Closet alcoba 3, corredizo', 'Muro oriental · 120 × 240 × 60', [
-    ('Cuerpo 1', '60', 'Colgado con entrepaño arriba.'),
-    ('Cuerpo 2', '60', '2 cajones y entrepaños.'),
-    ('Maletero', '120 × 35', 'Con puertas abatibles o corredizas.'),
-    ('Puertas', '2 × 60', 'Corredizas con marco de aluminio y panel de melamina de 9 mm, riel superior e inferior.'),
-], ['Con cama de 0,90 m quedan 50 cm de paso frente al closet; por eso las puertas son corredizas.'])}
+{CLO_CARD}
+{item('CLO-01', *CARP['CLO-01'])}
+{item('CLO-02', *CARP['CLO-02'])}
+{item('CLO-03', *CARP['CLO-03'])}
 '''
 S.append(sec('closets', '05 · Closets', 'CLO-01 a CLO-03', CLO,
              'En el plano real caben unos 4,15 m lineales entre las tres alcobas.'))
 
 OTROS = f'''
 <div class="figs">{fig(B.BE, '<b>Muro de aparatos de los baños.</b> El mueble flotante de 60 cm va junto a la puerta, bajo el espejo.', 'panel')}</div>
-{item('BAN-01', 'Mueble flotante baño principal', 'Muro oriental, junto a la puerta', [
-    ('Mueble', '60 × 38 × 45', 'Melamina RH roble natural con cantos en cola PUR; 1 puerta o cajón con recorte para el sifón; anclaje oculto al muro, a 47 cm del piso.'),
-], ['El lavamanos o la cubierta con lavamanos se suministra aparte; confirme medidas antes de fabricar.'])}
-{item('BAN-02', 'Mueble flotante baño auxiliar', 'Igual a BAN-01', [
-    ('Mueble', '60 × 38 × 45', 'Igual a BAN-01. El baño auxiliar ya viene terminado: cotícelo aparte porque puede que no se haga.'),
-])}
-{item('SAL-01', 'Panel de TV y repisa flotante', 'Muro occidental de la sala, frente al sofá', [
-    ('Panel', '120 × 100 × 3', 'Melamina roble natural, fijo al muro entre 0,95 y 1,95 m, con paso de cables oculto.'),
-    ('Repisa', '110 × 18 × 32', 'Flotante, a 36 cm del piso, con soportes ocultos.'),
-], ['El soporte del TV va anclado al muro, no al panel.'])}
+{item('BAN-01', *CARP['BAN-01'])}
+{item('BAN-02', *CARP['BAN-02'])}
+{item('SAL-01', *CARP['SAL-01'])}
 '''
 S.append(sec('otros', '06 · Baños y sala', 'BAN-01, BAN-02 y SAL-01', OTROS))
 
