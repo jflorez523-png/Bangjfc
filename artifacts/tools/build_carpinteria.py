@@ -142,7 +142,7 @@ S.append(sec('materiales', '03 · Materiales y herrajes', 'Lo que aplica a todos
 {sample('lower-b', 'Bajos, península y torre', 'Melamina RH gris piedra suave')}
 {sample('clo-b', 'Closets, baños y panel TV', 'Melamina RH roble natural')}
 {sample('wpc-b', 'Frente de la península', 'WPC acanalado roble natural')}
-{sample('ctr-b', 'Mesones (COC-05)', 'Granito de primera o superficie compacta')}
+{sample('ctr-b', 'Mesones (COC-05)', 'Piedra sinterizada blanca mate')}
 {sample('metal-b', 'Herrajes', 'Inoxidable y perfil de aluminio')}
 </div>
 <p class="disc">Muestras generadas por computador: los colores son aproximados. Traiga muestras físicas de los colores de su catálogo más cercanos.</p>
@@ -172,12 +172,12 @@ CARP = {
     'COC-04': ('Península con frente en WPC', 'Límite entre cocina y sala, unida al módulo bajo de COC-03', [
     ('Cuerpo', '150 × 78 × 60', 'Sobre zócalo retrocedido de 10 cm. Hacia la cocina: puerta de 50, cajonero de 50 con 3 cajones de caja metálica y puerta de 50.'),
     ('Frente y costado', '150 + 60 × 78', 'Panel WPC acanalado de interior, color roble natural, con fijación oculta, hacia la sala y en el costado occidental.'),
-    ('Voladizo', '100 × 30', 'Solo en el tramo de los bancos, para no estorbar la puerta de la alcoba principal (lo da el mesón, COC-05).'),
+    ('Voladizo', '100 × 30', 'Solo en el tramo de los bancos, para no estorbar la puerta de la alcoba principal (lo da el mesón, COC-05). Deje el cuerpo reforzado para anclar la platina de acero que sostiene el voladizo.'),
     ('Toma', '—', 'Perforación para toma doble en el costado hacia la cocina (la instala el electricista).'),
 ], ['Anclar el cuerpo al piso y al módulo bajo de COC-03.', 'Si prefiere más espacio para las rodillas: cuerpo de 55 cm y voladizo de 35 cm, con el mismo total de 90 cm. Indique si cambia el precio.', 'Los bancos no se incluyen.']),
     'COC-05': ('Mesones (si los suministran)', 'Si no los suministran, indíquelo: se cotizan con marmolería', [
-    ('Muro sur', '203 × 63,5 × 2', 'Granito de primera o superficie compacta con ficha técnica; recortes para lavaplatos y cubierta; borde pulido y sellado; silicona neutra antihongos.'),
-    ('Península y módulo', '100 × 94 + 80 × 64', 'Una pieza en L: 100 × 94 cm en el tramo con voladizo y 80 × 64 cm en el resto de la península y el módulo de 30.'),
+    ('Muro sur', '203 × 63,5 × 1,2', 'Piedra sinterizada blanca mate de 12 mm, con color en masa y ficha técnica; recortes para lavaplatos y cubierta con esquinas redondeadas; canto pulido; silicona neutra antihongos.'),
+    ('Península y módulo', '100 × 94 + 80 × 64', 'En L: 100 × 94 cm en el tramo con voladizo y 80 × 64 cm en el resto de la península y el módulo de 30. El voladizo va sobre platina de acero oculta.'),
     ('Salpicadero', '—', 'No es de carpintería: cerámica 30 × 60 que coloca el enchapador.'),
 ]),
     'CLO-01': ('Closet alcoba principal', 'Muro norte, junto a la ventana · 150 × 240 × 60', [

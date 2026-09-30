@@ -125,11 +125,13 @@ ITEMS = [
     ('APA-02', 'Instalación de electrodomésticos', 1, 'gl', 'Global', [
         'Conectar y probar la cubierta a gas, el horno empotrado y la campana, que suministra el propietario.']),
     ('MES-01', 'Mesón del muro sur', 1, 'und', '203 × 63,5 cm', [
-        'Granito de primera o superficie compacta con ficha técnica, 2 cm, borde pulido y sellado.',
-        'Recortes para lavaplatos y cubierta; instalación con silicona neutra antihongos.',
-        'Plantilla tomada después de instalar los muebles.']),
+        'Piedra sinterizada blanca mate, parecida al blanco de los muebles altos, lisa o con veta muy suave. Se aprueba con muestra física.',
+        '12 mm con color en masa, para que el canto y un eventual despique no muestren otro color; ficha técnica del fabricante. No requiere sellado.',
+        'Recortes para lavaplatos y cubierta con esquinas redondeadas, según el fabricante; canto pulido; silicona neutra antihongos.',
+        'Plantilla tomada después de instalar los muebles. Instalador con experiencia en sinterizado: adjunte fotos de trabajos.']),
     ('MES-02', 'Mesón de la península en L', 1, 'und', '100 × 94 + 80 × 64 cm', [
-        'Mismo material del MES-01, en una pieza en L: 100 × 94 cm en el tramo con voladizo de 30 cm y 80 × 64 cm sobre el resto de la península y el módulo.',
+        'Mismo material del MES-01, en L: 100 × 94 cm en el tramo con voladizo de 30 cm y 80 × 64 cm sobre el resto de la península y el módulo. En una pieza o en dos con junta mínima, según el fabricante.',
+        'El voladizo de 30 cm va apoyado en platina de acero o escuadras ocultas ancladas al cuerpo de la península, según la ficha del fabricante. Inclúyalas en el valor.',
         'Canto pulido a la vista por los tres lados libres.']),
     ('ASE-01', 'Protección, escombros y aseo', 1, 'gl', 'Global', [
         'Proteger zonas comunes, ascensor y lo ya instalado; retirar escombros; entregar limpio.']),
@@ -146,11 +148,12 @@ BYCODE = {i[0]: i for i in ITEMS}
 
 ALTS = [
     ('ALT-01', 'Salida de la campana al exterior con ducto, si la administración la autoriza', 'EXT-01'),
-    ('ALT-02', 'Mesones en superficie compacta (cuarzo o sinterizado) en lugar de granito', 'MES-01 y MES-02'),
+    ('ALT-02', 'Mesones en granito gris oscuro de 2 cm en lugar de sinterizado, para comparar', 'MES-01 y MES-02'),
     ('ALT-03', 'Grifería del lavaplatos con ducha extraíble', 'APA-01'),
     ('ALT-04', 'Lavadero compacto nuevo en lugar de reinstalar el entregado', 'HID-03'),
     ('ALT-05', 'Autonivelante en todo el piso de cocina y ropas en lugar de nivelación localizada', 'PIS-03'),
     ('ALT-06', 'Suministro de cubierta a gas de 4 puestos, horno empotrado de 60 cm y campana de 60 cm de gama media, con marca y referencia', 'APA-02'),
+    ('ALT-07', 'Salpicadero en la misma piedra sinterizada del mesón, en lugar de cerámica', 'ENC-02'),
 ]
 
 # ---------------------------------------------------------------- secciones
@@ -180,7 +183,7 @@ S.append(sec('materiales', '03 · Materiales', 'Acabados de la cocina', f'''
 {sample('tf-b', 'Piso de ropas', 'Cerámica antideslizante 30 × 30 gris piedra')}
 {sample('sp-b', 'Salpicadero', 'Cerámica marmolizada 30 × 60')}
 {sample('tw-b', 'Enchape de ropas', 'Cerámica clara 30 × 60')}
-{sample('ctr-b', 'Mesones', 'Granito de primera o superficie compacta')}
+{sample('ctr-b', 'Mesones', 'Piedra sinterizada blanca mate')}
 {sample('metal-b', 'Grifería', 'Acero inoxidable')}
 </div>
 <p class="disc">Muestras generadas por computador: los colores son aproximados. Traiga muestras físicas y fichas técnicas de lo que ofrece.</p>
@@ -238,7 +241,7 @@ S.append(sec('condiciones', '11 · Condiciones', 'Cómo presentar la cotización
     <li>Cambios de fachada o de ductos comunes.</li>
   </ul></div>
   <div class="card"><h3>Se coordina con</h3><ul>
-    <li><b>Carpintero:</b> plano de despiece (huella de los muebles para el SPC), perfil para el LED, perforaciones del lavaplatos y de la toma de la península, y fechas.</li>
+    <li><b>Carpintero:</b> plano de despiece (huella de los muebles para el SPC), perfil para el LED, perforaciones del lavaplatos y de la toma de la península, refuerzo para la platina del voladizo y fechas.</li>
     <li><b>Administración:</b> permisos de obra, horarios y salida de la campana si se pide.</li>
   </ul></div>
 </div>

@@ -23,7 +23,7 @@ MAT_A = {
 }
 MAT_B = {
     'spc': '#C9A575', 'spc-j': '#A9865A', 'paint': '#F3EEE4', 'upper': '#F4F1EA', 'lower': '#A9A49C',
-    'ctr': '#3D3C3B', 'ctr-f': '#8C8984', 'sp': '#E9E7E3', 'sp-j': '#CBC6BE', 'metal': '#A2A6AB',
+    'ctr': '#EEEBE5', 'ctr-f': '#D8D2C8', 'sp': '#E9E7E3', 'sp-j': '#CBC6BE', 'metal': '#A2A6AB',
     'tw': '#E9E7E3', 'tw-j': '#CBC6BE', 'tf': '#B2AEA7', 'tf-j': '#948F87', 'clo': '#D6B98F',
     'clo-in': '#C7A87D', 'van': '#C9A575', 'wpc': '#B8936A', 'wpc-j': '#8C6A46',
 }
@@ -36,7 +36,7 @@ MAT_C = {  # comunes a ambas opciones
 SWATCH_A = [('SPC roble claro', 'spc'), ('Muros blanco cálido', 'paint'), ('Altos blanco mate', 'upper'),
             ('Bajos taupe / moca claro', 'lower'), ('Granito Negro San Gabriel', 'ctr'), ('Herrajes negro mate', 'metal')]
 SWATCH_B = [('SPC roble natural', 'spc'), ('Muros blanco cálido', 'paint'), ('Altos blanco cálido', 'upper'),
-            ('Bajos gris piedra suave', 'lower'), ('Granito o superficie compacta', 'ctr'), ('Herrajes inoxidables', 'metal')]
+            ('Bajos gris piedra suave', 'lower'), ('Piedra sinterizada blanca', 'ctr'), ('Herrajes inoxidables', 'metal')]
 
 
 def mat_css(d):
@@ -740,7 +740,7 @@ LEG_PLAN = ('<div class="legend">'
             '<span class="key"><span class="sw pat-spc"></span>SPC zonas secas</span>'
             '<span class="key"><span class="sw pat-tf"></span>Cerámica antideslizante</span>'
             '<span class="key"><span class="sw" style="--c:var(--m-clo)"></span>Carpintería RH (incluida)</span>'
-            '<span class="key"><span class="sw" style="--c:var(--m-ctr)"></span>Mesón en granito</span>'
+            '<span class="key"><span class="sw" style="--c:var(--m-ctr)"></span>Mesón en piedra sinterizada</span>'
             '<span class="key"><span class="sw loose-k"></span>Mobiliario suelto (no incluido)</span>'
             '<span class="key"><span class="sw own-k"></span>Electrodoméstico propio</span>'
             '<span class="key"><span class="sw lt-k"></span>Luz de techo</span>'
@@ -776,7 +776,7 @@ MATROWS = [
     ('Muebles altos de cocina', 'Fondo 30–35 cm, alto 70–80 cm', 'upper-b', 'Melamina RH blanco cálido', 'Herrajes de marca con garantía.'),
     ('Muebles bajos y península', 'Cocina, península y torre', 'lower-b', 'Melamina RH gris piedra suave', 'Cantos de 2 mm y perfil tipo gola.'),
     ('Frente de la península', 'Cara hacia la sala', 'wpc-b', 'WPC acanalado roble natural', 'Frente y costado de la península.'),
-    ('Mesón', 'Muro sur y península, 2 cm', 'ctr-b', 'Granito de primera o superficie compacta', 'Con ficha técnica y sellado documentado.'),
+    ('Mesón', 'Muro sur y península, 12 mm', 'ctr-b', 'Piedra sinterizada blanca mate', 'Color en masa y ficha técnica; no requiere sellado.'),
     ('Salpicadero', 'Del mesón a los muebles altos', 'sp-b', 'Cerámica marmolizada 30 × 60', 'La propuesta admite blanca o marmolizada.'),
     ('Closets y mueble de baño', 'Tres alcobas y dos baños', 'clo-b', 'Melamina RH roble natural', 'Color sugerido dentro de la paleta.'),
     ('Piso de baños, ropas y balcón', 'Cerámica antideslizante', 'tf-b', 'Cerámica 30 × 30 gris piedra', 'Tono sugerido.'),
@@ -820,11 +820,12 @@ CH = [
     ('Preparación, nivelación e impermeabilización', (1.5, 2.3), 'Diagnóstico, nivelación y pruebas de humedad y estanqueidad'),
     ('Muros, estuco y pintura', (3.0, 3.7), 'Estuco, pintura lavable de mejor gama y remates'),
     ('Pisos SPC, cerámicas y transiciones', (4.7, 5.7), 'SPC con base acústica, cerámicas, zócalos y perfiles'),
-    ('Cocina + ropas', (8.0, 9.2), 'Carpintería RH, granito, salpicadero, herrajes de marca y circuitos'),
+    ('Cocina + ropas', (8.0, 9.2), 'Carpintería RH, mesón, salpicadero, herrajes de marca y circuitos'),
     ('Dos baños completos', (7.3, 8.5), 'Impermeabilización reforzada, enchapes, aparatos, griferías y divisiones'),
     ('Closets de tres alcobas', (3.8, 4.6), 'Melamina RH, distribución interna, herrajes y ventilación'),
     ('Eléctrico, iluminación, drywall y balcón', (2.2, 3.0), 'Circuitos, puntos, escenas de luz y acabados de balcón'),
-    ('Península 1,50 × 0,90 *', (2.0, 3.5), 'Estimado propio: mueble RH, granito, frente WPC, toma y colgantes'),
+    ('Península 1,50 × 0,90 *', (2.0, 3.5), 'Estimado propio: mueble RH, mesón, frente WPC, toma y colgantes'),
+    ('Mesones en piedra sinterizada **', (1.5, 2.5), 'Estimado propio: diferencia frente al granito de la propuesta'),
 ]
 SCALE = 10.0
 
@@ -1159,7 +1160,7 @@ V['resumen'] = f'''
 <div class="reco">
   <div class="tag">Plan de obra blanca</div>
   <h3>B mejorada + península</h3>
-  <p>Una península de 1,50 × 0,90 m en el límite entre cocina y sala. Tiene 60 cm de mueble del lado de la cocina y 30 cm de voladizo del lado de la sala, con mesón de granito y frente en WPC acanalado.</p>
+  <p>Una península de 1,50 × 0,90 m en el límite entre cocina y sala. Tiene 60 cm de mueble del lado de la cocina y 30 cm de voladizo del lado de la sala, con mesón en piedra sinterizada blanca y frente en WPC acanalado.</p>
   <ol class="five">
     <li><b>Pasillo de 1,10 m</b>Entre la península y el mesón, y 1,15 m libres desde la entrada.<br><button type="button" data-go="planta">Ver en Planta</button></li>
     <li><b>Agua y gas en su sitio</b>Lavaplatos y estufa donde Inacar deja las redes.<br><button type="button" data-go="cocina">Ver en Cocina</button></li>
@@ -1167,10 +1168,10 @@ V['resumen'] = f'''
     <li><b>Barra para dos</b>Hace de comedor, con dos lámparas colgantes.<br><button type="button" data-go="sala">Ver en Sala</button></li>
     <li><b>Puerta de la alcoba libre</b>El voladizo va solo donde están los bancos.<br><button type="button" data-go="cocina">Ver en Cocina</button></li>
   </ol>
-  <div class="ceiling">Total estimado: <span>$34,0–39,0 M sin electrodomésticos</span><span>$36,0–41,0 M con electrodomésticos</span></div>
+  <div class="ceiling">Total estimado: <span>$35,5–41,5 M sin electrodomésticos</span><span>$37,5–43,5 M con electrodomésticos</span></div>
   {swatches(SWATCH_B, MAT_B)}
 </div>
-{note('blue', 'i', '<b>La península no está en la propuesta.</b> El documento no la cotiza por separado. Sumo un estimado propio de $2,0–3,5 M para mueble RH, granito, frente en WPC, toma y lámparas. Pide que la coticen como capítulo aparte.')}
+{note('blue', 'i', '<b>La península no está en la propuesta.</b> El documento no la cotiza por separado. Sumo un estimado propio de $2,0–3,5 M para mueble RH, mesón, frente en WPC, toma y lámparas. Pide que la coticen como capítulo aparte.')}
 
 <div class="grid2">
   <div class="card"><h3>Qué incluye la Opción B</h3><ul>
@@ -1181,6 +1182,7 @@ V['resumen'] = f'''
     <li><b>Garantías y actas de entrega</b> por capítulo, con saldo retenido.</li>
   </ul></div>
   <div class="card"><h3>Cambios frente a la versión anterior</h3><ul>
+    <li><b>Mesones:</b> piedra sinterizada blanca mate en lugar del granito de la propuesta.</li>
     <li><b>Una sola opción:</b> se quitó la Optimizada; la página muestra solo la B con península.</li>
     <li><b>Plano real:</b> dibujos y renders siguen el plano comercial del 901, con puertas, ventanas y ductos en su sitio.</li>
     <li><b>Cocina:</b> el mueble va sobre el muro sur y mide 2,03 m; la nevera y la torre pasan al frente.</li>
@@ -1195,7 +1197,7 @@ V['materiales'] = f'''
 <h2>Los materiales de la Opción B</h2>
 <p class="sub">Paleta de roble natural, blanco cálido y gris piedra suave. Los colores en pantalla son aproximados: pide muestras físicas y fichas técnicas antes de comprar.</p>
 {mat_rows_html}
-{note('blue', 'i', '<b>Qué define la propuesta y qué es sugerencia.</b> La propuesta fija la paleta, el SPC, el granito, los formatos cerámicos y los herrajes. El tono exacto de las cerámicas de piso y el color de closets, mueble de baño y WPC son sugerencias dentro de esa paleta.')}
+{note('blue', 'i', '<b>Qué define la propuesta y qué es sugerencia.</b> La propuesta fija la paleta, el SPC, los formatos cerámicos y los herrajes; pedía granito en el mesón, que se cambió por piedra sinterizada blanca. El tono exacto de las cerámicas de piso y el color de closets, mueble de baño y WPC son sugerencias dentro de esa paleta.')}
 '''
 
 V['planta'] = f'''
@@ -1239,19 +1241,19 @@ V['cocina'] = f'''
 <div class="figs">{fig(PLAN_COCINA, '<b>Planta.</b> Península de 1,50 × 0,90 m: 60 cm de mueble y 30 cm de voladizo solo en el tramo de los bancos. La línea café punteada es la transición de SPC a cerámica en ropas.', 'panel')}</div>
 <div class="figs">{fig(KE, '<b>Muro sur visto desde la cocina.</b> El mueble mide 2,03 m: lavaplatos, cajonero, estufa con horno y un remate de 23 cm. Ropas queda bajo su ventana y la entrada al otro extremo.', 'panel')}</div>
 <div class="figs">{fig(PE, '<b>Península.</b> Hacia la sala, frente en WPC acanalado con dos bancos y dos lámparas colgantes. En corte, 60 cm de mueble y 30 cm de voladizo a 90 cm. Hacia la cocina, puertas y cajones.', 'panel')}</div>
-<div class="legend">{sw('upper', 'Altos blanco cálido')}{sw('lower', 'Bajos gris piedra suave')}{sw('ctr', 'Granito o superficie compacta')}{sw('sp', 'Salpicadero 30 × 60')}{sw('metal', 'Perfil de aluminio')}{sw('wpc', 'WPC acanalado')}{sw('led', 'LED 3.000 K')}</div>
+<div class="legend">{sw('upper', 'Altos blanco cálido')}{sw('lower', 'Bajos gris piedra suave')}{sw('ctr', 'Piedra sinterizada blanca')}{sw('sp', 'Salpicadero 30 × 60')}{sw('metal', 'Perfil de aluminio')}{sw('wpc', 'WPC acanalado')}{sw('led', 'LED 3.000 K')}</div>
 {note('blue', 'i', '<b>El mueble lineal es más corto de lo que suponía la propuesta.</b> El documento habla de 3,20–3,60 m. En el plano real, entre la entrada y ropas caben 2,03 m, así que la nevera y la torre pasan al frente, contra el muro de la alcoba principal. La península suma 1,50 m de mesón.')}
 {note('', '!', '<b>La propuesta pedía no instalar península.</b> Su razón era no bloquear la circulación. En este plano la península queda en el límite con la sala, con 1,10 m de pasillo y 1,15 m libres desde la entrada. El voladizo va solo en el tramo de los bancos para no estorbar la puerta de la alcoba principal.')}
 <div class="block"><h3>Especificación</h3>
 {spec_table([
     ('Distribución', 'Mueble de 2,03 m sobre el muro sur, entre la entrada y ropas. Al frente, nevera, módulo de 30 cm y torre. Península de 1,50 × 0,90 m hacia la sala. Mesón de 60 cm y pasillo de 1,10 m.'),
     ('Módulos', 'Lavaplatos 60 cm, cajonero 60 cm, estufa 60 cm y remate 23 cm. Al frente, nevera de 70 cm y torre de despensa y limpieza de 40 cm.'),
-    ('Península', 'Mueble RH de 60 cm con puertas y cajones hacia la cocina; granito con voladizo de 30 cm en el tramo de los bancos; frente y costado en WPC acanalado; toma doble; dos colgantes en circuito propio; dos bancos de 65 cm.'),
+    ('Península', 'Mueble RH de 60 cm con puertas y cajones hacia la cocina; mesón con voladizo de 30 cm en el tramo de los bancos, apoyado en platina de acero oculta; frente y costado en WPC acanalado; toma doble; dos colgantes en circuito propio; dos bancos de 65 cm.'),
     ('Carpintería', 'Melamina RH 18 mm con cantos de 2 mm en frentes; patas regulables; zócalo PVC/aluminio; bandeja antiderrame; organizador de cubiertos, gaveta profunda de ollas y bandeja extraíble de aseo.'),
     ('Colores', 'Altos en blanco cálido; bajos, península y torre en gris piedra suave, con perfil de aluminio tipo gola en lugar de manijas.'),
     ('Muebles altos', 'Fondo 30–35 cm, altura 70–80 cm, a 55–60 cm sobre el mesón. Siguen sobre la lavadora.'),
     ('Herrajes', 'Bisagras y correderas de extensión total de marca, con referencia y garantía; carga reforzada en el cajón de ollas.'),
-    ('Mesón', 'Granito de primera selección con sellado documentado, o superficie compacta con ficha técnica; 2 cm, borde pulido y silicona neutra antihongos.'),
+    ('Mesón', 'Piedra sinterizada blanca mate, parecida al blanco de los altos, lisa o con veta muy suave; 12 mm con color en masa y ficha técnica; cortes con esquinas redondeadas, canto pulido y silicona neutra antihongos. No requiere sellado.'),
     ('Salpicadero', 'Cerámica 30 × 60 marmolizada o blanca, desde el mesón hasta los muebles altos.'),
     ('Lavaplatos', 'Acero inoxidable de 60 × 40 cm aprox.; sifón accesible, válvulas de paso y grifería monomando de marca con repuestos.'),
     ('Electricidad', 'Circuitos dedicados para horno, lavadora, nevera y pequeños electrodomésticos; tablero y cableado revisados por electricista.'),
@@ -1335,7 +1337,7 @@ V['sala'] = f'''
 V['presupuesto'] = f'''
 <div class="kicker">Presupuesto objetivo · COP · Bucaramanga / Girón</div>
 <h2>Cocina y baños se llevan <span class="em">casi la mitad</span></h2>
-<p class="sub">Rangos objetivo de compra e instalación de la Opción B por capítulo, sobre una escala de 0 a 10 millones, más la península. Hay que validarlos con visita y cotizaciones comparables.</p>
+<p class="sub">Rangos objetivo de compra e instalación de la Opción B por capítulo, sobre una escala de 0 a 10 millones, más la península y el cambio a piedra sinterizada. Hay que validarlos con visita y cotizaciones comparables.</p>
 {budget_html}
 <div class="block"><h3>Totales</h3>
 <div class="tbl totals"><table>
@@ -1344,11 +1346,12 @@ V['presupuesto'] = f'''
 <tr><td>Subtotal de capítulos de la propuesta</td><td class="num">$31,5–38,4 M</td></tr>
 <tr><td>Ajuste de alcance de la propuesta</td><td class="num">−$0,5–2,9 M</td></tr>
 <tr><td>Península 1,50 × 0,90 (estimado propio) *</td><td class="num">+$2,0–3,5 M</td></tr>
-<tr class="big"><td>Total sin electrodomésticos</td><td class="num">$34,0–39,0 M</td></tr>
+<tr><td>Mesones en piedra sinterizada en vez de granito (estimado propio) **</td><td class="num">+$1,5–2,5 M</td></tr>
+<tr class="big"><td>Total sin electrodomésticos</td><td class="num">$35,5–41,5 M</td></tr>
 <tr><td>Electrodomésticos de gama media (estufa, campana y horno)</td><td class="num">$2,0–2,5 M</td></tr>
-<tr class="big"><td>Total con electrodomésticos</td><td class="num">$36,0–41,0 M</td></tr>
+<tr class="big"><td>Total con electrodomésticos</td><td class="num">$37,5–43,5 M</td></tr>
 </tbody></table></div>
-<p class="disc">La propuesta fija la Opción B en $32,0–35,5 M sin electrodomésticos, como objetivo de contratación y no como suma exacta de los rangos; el total de arriba le suma la península. * La propuesta no cotiza la península: el valor es un estimado propio para pedir cotización.</p>
+<p class="disc">La propuesta fija la Opción B en $32,0–35,5 M sin electrodomésticos, como objetivo de contratación y no como suma exacta de los rangos; el total de arriba le suma la península y el cambio de mesón. * La propuesta no cotiza la península: el valor es un estimado propio para pedir cotización. ** Diferencia estimada con precios publicados en Colombia en 2025–2026 para unos 2,7 m² de mesón; se confirma con cotización.</p>
 <p class="disc">Con el plano real, los closets suman unos 4,15 m lineales contra 5,30 m de la propuesta, y el mueble sobre el muro sur mide 2,03 m. Pide que ajusten esos capítulos a las medidas reales.</p>
 </div>
 <div class="grid2">
@@ -1555,7 +1558,7 @@ page = f'''<title>Obra Blanca Apto 901</title>
     <div><dt>Inmueble</dt><dd>Apto 901 · Torre 1<small>Etapa 1 · Piso 9 · Tipo A</small></dd></div>
     <div><dt>Área privada</dt><dd>44,30 m²<small>Altura libre ≈ 2,40 m</small></dd></div>
     <div><dt>Distribución</dt><dd>3 alcobas · 2 baños<small>Cocina-ropas · sala-comedor · balcón</small></dd></div>
-    <div><dt>Presupuesto B + península</dt><dd>$34,0–39,0 M<small>Sin electrodomésticos · estimado</small></dd></div>
+    <div><dt>Presupuesto B + península</dt><dd>$35,5–41,5 M<small>Sin electrodomésticos · estimado</small></dd></div>
     <div><dt>Precio</dt><dd>$210.000.000<small>VIS · Notaría 2 Bmga</small></dd></div>
   </dl>
 </div></header>
@@ -1564,7 +1567,7 @@ page = f'''<title>Obra Blanca Apto 901</title>
 </div></nav>
 <main>{views_html}</main>
 <footer><div class="wrap">
-  <p><b>En resumen:</b> elegiste la Opción B con una península de 1,50 × 0,90 m hacia la sala, sobre el plano real del 901: dos baños completos, cocina sobre el muro sur con nevera y torre al frente, y closets en las tres alcobas. Total estimado de <b>$34,0–39,0 M</b> sin electrodomésticos.</p>
+  <p><b>En resumen:</b> elegiste la Opción B con una península de 1,50 × 0,90 m hacia la sala, sobre el plano real del 901: dos baños completos, cocina sobre el muro sur con nevera y torre al frente, y closets en las tres alcobas. Total estimado de <b>$35,5–41,5 M</b> sin electrodomésticos, con mesones en piedra sinterizada blanca.</p>
   <p class="disc">Hecho a partir de tu contrato de promesa de compraventa, el anexo de especificaciones de Inacar y la Propuesta de acabados Tipo A del 29-sep-2026. Las vistas son conceptuales: no sirven para fabricar carpintería, cortar piedra ni mover redes sin medir en obra.</p>
 </div></footer>
 <script>{JS}</script>

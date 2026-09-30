@@ -278,7 +278,7 @@ OPC = [
     ('OPC-01', 'Baño auxiliar completo igual al principal, retirando lo entregado', 'Baño auxiliar'),
     ('OPC-02', 'Baño auxiliar solo con mueble flotante (BAN-02), espejo con luz y división en vidrio', 'Baño auxiliar'),
     ('OPC-03', 'Salida de la campana al exterior con ducto, si la administración la autoriza', 'EXT-01'),
-    ('OPC-04', 'Mesones en superficie compacta (cuarzo o sinterizado) en lugar de granito', 'MES-01 y MES-02'),
+    ('OPC-04', 'Mesones en granito gris oscuro de 2 cm en lugar de sinterizado, para comparar', 'MES-01 y MES-02'),
     ('OPC-05', 'Muebles altos y torre hasta el techo (90 cm en vez de 75)', 'COC-02 y COC-03'),
     ('OPC-06', 'Suministro de cubierta a gas, horno empotrado y campana de gama media, con marca y referencia', 'APA-02'),
     ('OPC-07', 'Lavadero compacto nuevo en lugar de reinstalar el entregado', 'HID-03'),
@@ -286,6 +286,7 @@ OPC = [
     ('OPC-09', 'Cajillo en drywall con luz indirecta en la sala, solo si la altura lo permite', 'Sala'),
     ('OPC-10', 'Tira LED con sensor de movimiento dentro de los tres closets', 'CLO-01 a 03'),
     ('OPC-11', 'Puertas interiores en roble natural, para que combinen con los closets', 'PUE-01 a 04'),
+    ('OPC-12', 'Salpicadero en la misma piedra sinterizada del mesón, en lugar de cerámica', 'ENC-02'),
 ]
 opc_rows = ''.join(f'<tr><td class="z">{c}</td><td>{t}</td><td>{w}</td></tr>' for c, t, w in OPC)
 S.append(sec('opciones', f'{N + 1:02d} · Opciones', 'Cotizar por separado', f'''

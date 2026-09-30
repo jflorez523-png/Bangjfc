@@ -23,7 +23,7 @@ export const OPT = {
     gola: false, tower: false, lights2: false,
   },
   b: {
-    spc: '#C9A575', spcJ: '#9E7C52', upper: '#F4F1EA', lower: '#A9A49C', ctr: '#3D3C3B',
+    spc: '#C9A575', spcJ: '#9E7C52', upper: '#F4F1EA', lower: '#A9A49C', ctr: '#EEEBE5', sint: true,
     ctrF: ['#8C8984', '#A7A39D', '#5A5856', '#C9C5BF', '#2E2D2C'], sp: '#ECEAE6', spJ: '#CFCAC2', spVeins: true,
     metal: { color: '#B4B8BD', roughness: 0.28, metalness: 1.0 }, tw: '#E9E7E3', twJ: '#CBC6BE',
     tf: '#B2AEA7', tfJ: '#8F8A82', clo: '#D2B28A', cloWood: true, van: '#C9A575', vanWood: true,
@@ -106,6 +106,29 @@ function graniteSpec(base, flecks, seed = 3, px = 1024, size = 0.6) {
       const s = 0.5 + r() * 2.2; g.fillRect(r() * w, r() * h, s, s * (0.5 + r() * 0.9));
     }
     g.globalAlpha = 1;
+  });
+  return { tex, sx: size, sy: size };
+}
+
+// piedra sinterizada blanca mate: base cálida, manchas muy suaves y vetas tenues
+function sinteredSpec(base, seed = 12, px = 1024, size = 2.2) {
+  const tex = canvasTex(px, px, (g, w, h) => {
+    const r = rng(seed);
+    g.fillStyle = base; g.fillRect(0, 0, w, h);
+    for (let k = 0; k < 90; k++) {
+      g.fillStyle = r() < 0.5 ? `rgba(120,110,95,${0.012 + r() * 0.018})` : `rgba(255,255,252,${0.02 + r() * 0.03})`;
+      const s = 30 + r() * 120; g.beginPath(); g.arc(r() * w, r() * h, s, 0, 7); g.fill();
+    }
+    for (let k = 0; k < 7; k++) {
+      const y0 = r() * h, x1 = w * (0.3 + r() * 0.4), y1 = y0 + (r() - 0.5) * h * 0.5;
+      for (const [lw, a] of [[5, 0.025], [2, 0.05], [0.8, 0.09]]) {
+        g.strokeStyle = `rgba(140,133,122,${a})`; g.lineWidth = lw; g.beginPath(); g.moveTo(-10, y0);
+        g.bezierCurveTo(x1, y0 + (r() - 0.5) * 80, x1, y1, w + 10, y1 + (r() - 0.5) * 60); g.stroke();
+      }
+    }
+    for (let k = 0; k < 6000; k++) {
+      g.fillStyle = `rgba(90,85,78,${0.02 + r() * 0.04})`; g.fillRect(r() * w, r() * h, 1.2, 1.2);
+    }
   });
   return { tex, sx: size, sy: size };
 }
@@ -345,7 +368,8 @@ function materials(P) {
   M.screen = std({ color: '#0B0D10', roughness: 0.12, metalness: 0.3 });
   // texturas
   M.spc = woodSpec(P.spc, P.spcJ, { seed: P === OPT.a ? 2 : 4 });
-  M.granite = graniteSpec(P.ctr, P.ctrF, 3);
+  M.granite = P.sint ? sinteredSpec(P.ctr) : graniteSpec(P.ctr, P.ctrF, 3);
+  M.ctrR = P.sint ? 0.34 : 0.16;
   M.splash = tileSpec({ tw: 0.6, th: 0.3, cols: 2, rows: 4, base: P.sp, grout: P.spJ, veins: P.spVeins, seed: 6 });
   M.wallTile = tileSpec({ tw: 0.6, th: 0.3, cols: 2, rows: 4, base: P.tw, grout: P.twJ, seed: 8 });
   M.floorTile = tileSpec({ tw: 0.3, th: 0.3, cols: 4, rows: 4, base: P.tf, grout: P.tfJ, speckle: true, vary: 0.035, seed: 10 });
@@ -417,7 +441,7 @@ function cocina(P, view = 1) {
   box(S, 2.47, 0.77, fz + 0.02, 2.93, 0.785, fz + 0.05, M.steelDark);
   // mesón granito
   const ctrEnd = P.tower ? 3.00 : 3.40;
-  const gmat = std({ color: '#FFFFFF', roughness: 0.16, metalness: 0.05, map: texFor(M.granite, ctrEnd - 0.70, 0.61) });
+  const gmat = std({ color: '#FFFFFF', roughness: M.ctrR, metalness: 0.05, map: texFor(M.granite, ctrEnd - 0.70, 0.61) });
   box(S, 0.70, 0.88, 0, ctrEnd, 0.90, 0.61, gmat);
   // lavaplatos
   box(S, 0.78, 0.9005, 0.10, 1.22, 0.9015, 0.50, M.steel, { cast: false });
@@ -706,7 +730,7 @@ function sample(id) {
   if (s.kind === 'paint') { top = std({ color: '#FFFFFF', roughness: 0.9, map: texFor(noiseSpec('#F3EEE4', 0.05), w, d) }); }
   if (s.kind === 'mel') { top = std({ color: P[s.key], roughness: 0.55 }); side = std({ color: P[s.key], roughness: 0.45 }); }
   if (s.kind === 'veneer') { top = std({ color: '#FFFFFF', roughness: 0.55, map: texFor(woodSpec(P.clo, '#000', { cols: 6, rows: 1, pw: 0.12, pl: 1.2, joints: false, vary: 0.035, seed: 21 }), w * 2.5, d * 2.5) }); side = std({ color: P.clo, roughness: 0.5 }); }
-  if (s.kind === 'granite') { top = std({ color: '#FFFFFF', roughness: 0.14, metalness: 0.05, map: texFor(M.granite, w, d) }); side = top; }
+  if (s.kind === 'granite') { top = std({ color: '#FFFFFF', roughness: M.ctrR, metalness: 0.05, map: texFor(M.granite, w * 2.5, d * 2.5) }); side = P.sint ? std({ color: P.ctr, roughness: 0.4 }) : top; }
   if (s.kind === 'splash') { top = std({ color: '#FFFFFF', roughness: 0.15, map: texFor(M.splash, 0.9, 0.65) }); }
   if (s.kind === 'ftile') { top = std({ color: '#FFFFFF', roughness: 0.8, map: texFor(M.floorTile, 0.45, 0.33) }); side = std({ color: P.tf, roughness: 0.8 }); }
   if (s.kind === 'wtile') { top = std({ color: '#FFFFFF', roughness: 0.22, map: texFor(M.wallTile, 0.9, 0.65) }); side = std({ color: P.tw, roughness: 0.4 }); }
@@ -912,7 +936,7 @@ function apartment(P, view) {
   box(S, 2.122, 0.265, fz - 0.02, 2.718, 0.878, fz, M.steel);
   box(S, 2.17, 0.35, fz - 0.024, 2.67, 0.72, fz - 0.02, M.blackGlass);
   box(S, 2.19, 0.77, fz - 0.05, 2.65, 0.785, fz - 0.02, M.steelDark);
-  const gm = (w, d) => std({ color: '#FFFFFF', roughness: 0.16, metalness: 0.05, map: texFor(M.granite, w, d) });
+  const gm = (w, d) => std({ color: '#FFFFFF', roughness: M.ctrR, metalness: 0.05, map: texFor(M.granite, w, d) });
   box(S, 0.92, 0.88, 1.665, 2.95, 0.90, 2.30, gm(2.03, 0.635));
   box(S, 1.00, 0.9005, 1.80, 1.44, 0.9015, 2.20, M.steel, { cast: false });
   box(S, 1.02, 0.9016, 1.82, 1.42, 0.9022, 2.18, std({ color: '#7F8387', roughness: 0.3, metalness: 1 }), { cast: false });
