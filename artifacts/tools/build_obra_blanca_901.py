@@ -19,18 +19,18 @@ MAT_A = {
     'spc': '#D9BF98', 'spc-j': '#BFA37C', 'paint': '#F3EEE4', 'upper': '#F7F5F0', 'lower': '#A8937F',
     'ctr': '#26262A', 'ctr-f': '#7A7672', 'sp': '#EFECE7', 'sp-j': '#D3CCC2', 'metal': '#232326',
     'tw': '#EDE9E2', 'tw-j': '#D0C9BE', 'tf': '#C2BAAE', 'tf-j': '#A59B8E', 'clo': '#EEE9E0',
-    'clo-in': '#E2DCD1', 'van': '#A8937F',
+    'clo-in': '#E2DCD1', 'van': '#A8937F', 'wpc': '#B8936A', 'wpc-j': '#8C6A46',
 }
 MAT_B = {
     'spc': '#C9A575', 'spc-j': '#A9865A', 'paint': '#F3EEE4', 'upper': '#F4F1EA', 'lower': '#A9A49C',
     'ctr': '#3D3C3B', 'ctr-f': '#8C8984', 'sp': '#E9E7E3', 'sp-j': '#CBC6BE', 'metal': '#A2A6AB',
     'tw': '#E9E7E3', 'tw-j': '#CBC6BE', 'tf': '#B2AEA7', 'tf-j': '#948F87', 'clo': '#D6B98F',
-    'clo-in': '#C7A87D', 'van': '#C9A575',
+    'clo-in': '#C7A87D', 'van': '#C9A575', 'wpc': '#B8936A', 'wpc-j': '#8C6A46',
 }
 MAT_C = {  # comunes a ambas opciones
     'porc': '#FBFBF9', 'steel': '#C9CDD2', 'glass': '#BFDCE4', 'glass-l': '#5E97AA', 'led': '#FFD08A',
     'lav': '#F1F1EE', 'zoc': '#8F9194', 'cloth': '#B9C2CE', 'shoe': '#8B7866', 'mirror': '#D5E2E7',
-    'e-line': '#2B2F38', 'e-halo': '#F7F4EE', 'oven': '#3A3F47', 'outlet': '#FAFAF8',
+    'e-line': '#2B2F38', 'e-halo': '#F7F4EE', 'oven': '#3A3F47', 'outlet': '#FAFAF8', 'door': '#D6C3A5',
 }
 
 SWATCH_A = [('SPC roble claro', 'spc'), ('Muros blanco cálido', 'paint'), ('Altos blanco mate', 'upper'),
@@ -207,177 +207,273 @@ def round_table(d, cx, cy, r):
     d.a(s)
 
 
-# ---------------------------------------------------------------- planos por espacio
-def plan_canvas(pid, w, h, k, fs, extra=(0, 0, 0, 0)):
-    """extra = cm adicionales (izq, arriba, der, abajo) para cotas internas o anexos."""
-    fsc = fs / k
-    L = T + 2.3 * fsc + extra[0]
-    Tp = T + 2.3 * fsc + extra[1]
-    R = T + 0.8 * fsc + extra[2]
-    B = T + 0.8 * fsc + extra[3]
-    return D(pid, (-L, -Tp, w + L + R, h + Tp + B), k, fs)
+# ---------------------------------------------------------------- plano real del Apto 901
+# Espejo del Tipo A. Coordenadas en cm: X hacia el oriente, Y hacia el sur (norte arriba, balcón al norte).
+# Origen: esquina noroccidental interior de la cocina, sobre el límite entre cocina y sala.
+WALLS = [
+    (-261, -400, -246, -90),   # alcoba 2, muro occidental
+    (-246, -400, -115, -385),  # alcoba 2, muro norte
+    (-16, -400, 0, -90),       # alcoba 2 / sala
+    (199, -366, 281, -339),    # sala, esquina nororiental
+    (380, -366, 547, -339),    # alcoba principal, muro norte
+    (265, -339, 281, -94),     # sala / alcoba principal
+    (529, -339, 547, 246),     # fachada oriental
+    (-357, -105, -341, 182),   # alcoba 3, muro occidental
+    (-261, -105, -94, -90),    # alcoba 2 / alcoba 3
+    (265, -15, 421, 1),        # alcoba principal / ropas
+    (490, -15, 529, 1),        # alcoba principal / baño principal
+    (-140, -10, -125, 179),    # alcoba 3 / baño auxiliar
+    (405, 1, 421, 246),        # ropas / baño principal
+    (-56, 5, 0, 15),           # baño auxiliar, norte
+    (-16, 15, 0, 246),         # baño auxiliar / entrada
+    (-357, 166, -140, 182),    # alcoba 3, sur
+    (-140, 230, -16, 246),     # baño auxiliar, sur
+    (92, 230, 356, 246),       # cocina, muro sur
+    (469, 230, 529, 246),      # baño principal, sur
+]
+DUCTS = [(-36, 140, -16, 230), (510, 140, 529, 230)]
+# vanos de ventana: rect del vano, alféizar y dintel (cm)
+WINDOWS = [
+    ((-115, -400, -16, -385), 90, 210),   # alcoba 2
+    ((281, -366, 380, -339), 90, 210),    # alcoba principal
+    ((0, -366, 199, -339), 0, 210),       # puerta-ventana del balcón
+    ((-341, -105, -261, -90), 90, 210),   # alcoba 3
+    ((-140, 179, -125, 230), 140, 210),   # baño auxiliar
+    ((356, 230, 405, 246), 120, 210),     # ropas
+    ((421, 230, 469, 246), 140, 210),     # baño principal
+]
+# puertas: vano, bisagra, extremo cerrado, extremo abierto
+DOORS = [
+    ((0, 230, 92, 246), (0, 230), (92, 230), (0, 138)),              # entrada
+    ((265, -94, 281, -15), (281, -15), (281, -94), (360, -15)),      # alcoba principal
+    ((421, -15, 490, 1), (421, 1), (490, 1), (421, 70)),             # baño principal
+    ((-94, -105, -16, -90), (-16, -105), (-94, -105), (-16, -183)),  # alcoba 2
+    ((-140, -90, -125, -10), (-140, -90), (-140, -10), (-220, -90)), # alcoba 3
+    ((-125, 5, -56, 15), (-125, 15), (-56, 15), (-125, 84)),         # baño auxiliar
+]
+FLOORS = [  # (x0, y0, x1, y1, material)
+    (0, -339, 265, 0, 'spc'), (0, 0, 295, 230, 'spc'), (295, 0, 405, 230, 'tf'),
+    (-125, -105, 0, 15, 'spc'), (-246, -385, -16, -105, 'spc'), (-341, -90, -140, 166, 'spc'),
+    (281, -339, 529, -15, 'spc'), (421, 1, 529, 230, 'tf'), (-125, 15, -16, 230, 'tf'),
+    (265, -94, 281, -15, 'spc'), (421, -15, 490, 1, 'tf'), (-140, -90, -125, -10, 'spc'), (0, 230, 92, 246, 'spc'),
+]
+BALCONY = (0, -438, 200, -366)
+ROOM_LABELS = [
+    ('SALA-COMEDOR', '2,65 × 3,40', 132, -110), ('COCINA', '4,05 × 2,30', 175, 128), ('ROPAS', '', 352, 128),
+    ('ALCOBA PRINCIPAL', '2,50 × 3,38', 405, -150), ('ALCOBA 2', '2,30 × 2,80', -131, -225),
+    ('ALCOBA 3', '2,00 × 2,55', -290, 60), ('BAÑO', '1,10 × 2,10', 460, 172), ('BAÑO', '1,10 × 2,10', -86, 172),
+    ('BALCÓN', '2,00 × 0,72', 100, -405),
+]
 
 
-def top_left_dims(d, w, h):
-    y = -T - 0.9 * d.fs
-    d.dimh(0, w, y, m(w))
-    x = -T - 0.9 * d.fs
-    d.dimv(0, h, x, m(h))
+def rect(x0, y0, x1, y1, cls, extra=''):
+    return f'<rect x="{x0:g}" y="{y0:g}" width="{x1 - x0:g}" height="{y1 - y0:g}" class="{cls}"{extra}/>'
 
 
-def draw_kitchen(d, detail):
-    w, h = 405, 230
-    d.floor(0, 0, w, h, 'spc')
-    d.floor(255, 115, 150, 115, 'tf')
-    d.a('<path d="M255 115V230M255 115H405" class="trans"/>')
-    d.walls(w, h)
-    # nevera (propia)
-    d.a('<rect x="3" y="3" width="64" height="60" class="own"/>')
-    # mesón y módulos
-    d.a(f'<rect x="70" y="0" width="270" height="60" fill="url(#{d.pid}-gr)" class="ol"/>')
-    d.a('<path d="M130 0V60M180 0V60M240 0V60M300 0V60" class="hid"/>')
-    d.a('<rect x="78" y="10" width="44" height="40" rx="3" class="steel ol"/><circle cx="100" cy="6" r="2.2" class="metal"/>')
-    d.a('<rect x="244" y="4" width="52" height="52" rx="2" class="cook"/>')
-    for cx, cy in ((257, 17), (283, 17), (257, 43), (283, 43)):
+def bed2(d, x0, y0, x1, y1, head):
+    """Cama suelta entre (x0,y0)-(x1,y1); head: 'n', 's', 'e' u 'o'."""
+    s = '<g class="loose">' + f'<rect x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" rx="3"/>'
+    horiz = head in ('e', 'o')
+    across = (y1 - y0) if horiz else (x1 - x0)
+    n = 2 if across >= 120 else 1
+    pw = (across - 12 - (n - 1) * 6) / n
+    for i in range(n):
+        o = 6 + i * (pw + 6)
+        if head == 'n':
+            s += f'<rect x="{x0 + o:.1f}" y="{y0 + 6}" width="{pw:.1f}" height="20" rx="5"/>'
+        if head == 's':
+            s += f'<rect x="{x0 + o:.1f}" y="{y1 - 26}" width="{pw:.1f}" height="20" rx="5"/>'
+        if head == 'o':
+            s += f'<rect x="{x0 + 6}" y="{y0 + o:.1f}" width="20" height="{pw:.1f}" rx="5"/>'
+        if head == 'e':
+            s += f'<rect x="{x1 - 26}" y="{y0 + o:.1f}" width="20" height="{pw:.1f}" rx="5"/>'
+    if head == 'n':
+        s += f'<path d="M{x0} {y0 + 44}H{x1}" class="fold"/>'
+    if head == 's':
+        s += f'<path d="M{x0} {y1 - 44}H{x1}" class="fold"/>'
+    if head == 'o':
+        s += f'<path d="M{x0 + 44} {y0}V{y1}" class="fold"/>'
+    if head == 'e':
+        s += f'<path d="M{x1 - 44} {y0}V{y1}" class="fold"/>'
+    d.a(s + '</g>')
+
+
+def closet2(d, x0, y0, x1, y1, front, leaves, swings=False, sliding=False):
+    s = rect(x0, y0, x1, y1, 'm-clo ol')
+    if front in ('n', 's'):
+        s += f'<path d="M{x0 + 4} {(y0 + y1) / 2}H{x1 - 4}" class="rod"/>'
+        fy = y0 if front == 'n' else y1
+        s += f'<path d="M{x0} {fy}H{x1}" class="front"/>'
+        lw = (x1 - x0) / leaves
+        for i in range(1, leaves):
+            s += f'<path d="M{x0 + i * lw:.1f} {fy}V{fy + (4 if front == "n" else -4)}" class="ol"/>'
+        if swings:
+            sg = -1 if front == 'n' else 1
+            for i in range(leaves):
+                left = i % 2 == 0
+                hx = x0 + i * lw if left else x0 + (i + 1) * lw
+                fx = hx + lw if left else hx - lw
+                oy = fy + sg * lw
+                sweep = (0 if left else 1) if front == 'n' else (1 if left else 0)
+                s += f'<path d="M{hx:.1f} {fy}V{oy:.1f}M{fx:.1f} {fy}A{lw:.1f} {lw:.1f} 0 0 {sweep} {hx:.1f} {oy:.1f}" class="swing"/>'
+    else:
+        s += f'<path d="M{(x0 + x1) / 2} {y0 + 4}V{y1 - 4}" class="rod"/>'
+        fx = x0 if front == 'o' else x1
+        dx = 4 if front == 'o' else -4
+        if sliding:
+            my = (y0 + y1) / 2
+            s += f'<path d="M{fx} {y0}V{my + 8}" class="front"/><path d="M{fx + dx} {my - 8}V{y1}" class="front"/>'
+        else:
+            s += f'<path d="M{fx} {y0}V{y1}" class="front"/>'
+    d.a(s)
+
+
+def sofa_e(d, x0, y0, x1, y1):
+    """Sofá contra el muro oriental, mirando al occidente."""
+    r4, r3 = ' rx="4"', ' rx="3"'
+    parts = [rect(x0, y0, x1, y1, '', r4), rect(x1 - 18, y0, x1, y1, '', r3),
+             rect(x0, y0, x1, y0 + 15, '', r3), rect(x0, y1 - 15, x1, y1, '', r3)]
+    d.a('<g class="loose">' + ''.join(parts) + f'<path d="M{x0} {(y0 + y1) / 2}H{x1 - 18}" class="fold"/></g>')
+
+
+def door_arc(hinge, closed, opened):
+    hx, hy = hinge
+    r = ((closed[0] - hx) ** 2 + (closed[1] - hy) ** 2) ** 0.5
+    cross = (closed[0] - hx) * (opened[1] - hy) - (closed[1] - hy) * (opened[0] - hx)
+    sweep = 1 if cross > 0 else 0
+    return (f'<path d="M{hx} {hy}L{opened[0]} {opened[1]}" class="leaf"/>'
+            f'<path d="M{closed[0]} {closed[1]}A{r:.1f} {r:.1f} 0 0 {sweep} {opened[0]} {opened[1]}" class="swing"/>')
+
+
+def plan_content(d, mode):
+    """mode: 'full' (planta completa con nombres) o 'crop' (detalle con rótulos de muebles)."""
+    det = mode == 'crop'
+    for x0, y0, x1, y1, mat in FLOORS:
+        d.floor(x0, y0, x1 - x0, y1 - y0, mat)
+    bx0, by0, bx1, by1 = BALCONY
+    d.a(f'<path d="M{bx0} {by1}V{by0}H{bx1 - 40}A40 40 0 0 1 {bx1} {by0 + 40}V{by1}Z" fill="url(#{d.pid}-tf)" class="ol"/>')
+    d.a(f'<path d="M{bx0 - 8} -400V{by0 - 6}H{bx1 - 40}A46 46 0 0 1 {bx1 + 6} {by0 + 40}V{by1}" class="rail"/>')
+    d.a('<path d="M295 0V230" class="trans"/>')
+    # muros, ductos, ventanas y puertas
+    d.a(''.join(rect(*w, 'pc') for w in WALLS))
+    for x0, y0, x1, y1 in DUCTS:
+        d.a(rect(x0, y0, x1, y1, 'duct') + f'<path d="M{x0} {y0}L{x1} {y1}M{x1} {y0}L{x0} {y1}" class="duct-x"/>')
+    for (x0, y0, x1, y1), sill, head in WINDOWS:
+        d.a(rect(x0, y0, x1, y1, 'win'))
+        if x1 - x0 >= y1 - y0:
+            d.a(f'<path d="M{x0} {(y0 + y1) / 2}H{x1}" class="glass"/>')
+        else:
+            d.a(f'<path d="M{(x0 + x1) / 2} {y0}V{y1}" class="glass"/>')
+    for gap, hinge, closed, opened in DOORS:
+        d.a(door_arc(hinge, closed, opened))
+    # baños: mueble, sanitario y ducha sobre el muro oriental
+    for ex, dx0 in ((529, 421), (-16, -125)):
+        d.a(rect(ex - 45, 25, ex, 85, 'm-van ol') + f'<ellipse cx="{ex - 22}" cy="55" rx="13" ry="18" class="porc ol"/>')
+        d.a(rect(ex - 18, 88, ex, 128, 'porc ol', ' rx="2"') + f'<ellipse cx="{ex - 43}" cy="108" rx="25" ry="17" class="porc ol"/>')
+        sx1 = ex - 19
+        d.a(f'<path d="M{dx0} 140H{dx0 + 55}" class="glass"/><path d="M{dx0 + 40} 144H{sx1}" class="glass"/>')
+        d.a(f'<circle cx="{(dx0 + sx1) / 2}" cy="190" r="4" class="drain"/>')
+    # cocina: muro sur (común a A y B)
+    d.a(f'<rect x="92" y="170" width="203" height="60" fill="url(#{d.pid}-gr)" class="ol"/>')
+    d.a('<path d="M152 170V230M212 170V230M272 170V230" class="hid"/>')
+    d.a(rect(100, 180, 144, 220, 'steel ol', ' rx="3"') + '<circle cx="122" cy="226" r="2.2" class="metal"/>')
+    d.a(rect(216, 176, 268, 226, 'cook', ' rx="2"'))
+    for cx, cy in ((229, 189), (255, 189), (229, 213), (255, 213)):
         d.a(f'<circle cx="{cx}" cy="{cy}" r="8" class="burner"/>')
-    # ropas
-    d.a('<rect x="257" y="170" width="56" height="58" class="own"/><circle cx="285" cy="199" r="21" class="own"/>')
-    d.a('<rect x="315" y="172" width="50" height="58" class="lav ol"/><rect x="322" y="180" width="36" height="40" rx="4" class="lavb"/>')
-    d.a('<rect x="365" y="170" width="40" height="60" class="m-lower ol"/>')
-    if detail:
-        d.a('<rect x="70" y="0" width="270" height="35" class="hid"/>')
-        d.t(40, 36, 'Nevera', size=0.8)
-        d.dimv(60, 170, 200, '', size=0.85)
-        d.t(208, 120, 'Pasillo 1,10', size=0.85, anchor='start')
-        d.t(205, 84, 'Mesón granito · fondo 60', size=0.85)
-        fs = 0.74
-        d.t(285, 162, 'Lavadora', size=fs)
-        d.t(340, 162, 'Lavadero', size=fs)
-        d.t(385, 162, 'Gabinete', size=fs)
-        d.t(330, 142, 'Ropas', size=0.9)
-        # cotas de módulos
-        y = -T - 0.9 * d.fs
-        x = 0
-        for wd in (70, 60, 50, 60, 60, 40, 65):
-            d.dimh(x, x + wd, y, str(wd), size=0.82)
-            x += wd
-        y2 = -T - 2.3 * d.fs
-        d.dimh(0, 405, y2, '4,05')
-        d.dimv(0, 230, -T - 0.9 * d.fs, '2,30')
-        xr = w + T + 0.9 * d.fs
-        d.dimv(0, 60, xr, '60', size=0.82, right=True)
-        d.dimv(60, 170, xr, '1,10', size=0.82, right=True)
-        d.dimv(170, 230, xr, '60', size=0.82, right=True)
-        yb = h + T + 0.9 * d.fs
-        d.dimh(255, 315, yb, '60', size=0.82, below=True)
-        d.dimh(315, 365, yb, '50', size=0.82, below=True)
-        d.dimh(365, 405, yb, '40', size=0.82, below=True)
+    d.a(rect(297, 172, 353, 230, 'own') + '<circle cx="325" cy="201" r="21" class="own"/>')
+    d.a(rect(357, 174, 405, 230, 'lav ol') + rect(362, 180, 400, 222, 'lavb', ' rx="4"'))
+    # cocina: frente norte (nevera y torre en A y B)
+    d.a(rect(297, 3, 363, 68, 'own') + rect(365, 1, 405, 61, 'm-lower ol'))
+    # B: península + módulo junto a la nevera
+    d.a('<g class="only-b">'
+        + rect(265, 1, 295, 61, 'ol', f' fill="url(#{d.pid}-gr)"')
+        + f'<path d="M115 -30H215V0H265V60H115Z" fill="url(#{d.pid}-gr)" class="ol"/>'
+        + '<path d="M115 0H215" class="hid"/>'
+        + '<g class="loose"><circle cx="140" cy="-52" r="17"/><circle cx="190" cy="-52" r="17"/></g></g>')
+    light(d, 140, 18, r=5, cls='only-b')
+    light(d, 190, 18, r=5, cls='only-b')
+    # A: comedor redondo para 4
+    d.a('<g class="only-a">')
+    round_table(d, 175, 36, 45)
+    d.a('</g>')
+    # sala
+    sofa_e(d, 180, -305, 265, -155)
+    d.a('<circle cx="118" cy="-230" r="24" class="loose"/>')
+    d.a(rect(0, -290, 10, -170, 'm-clo ol'))
+    light(d, 132, -170, cls='only-a')
+    light(d, 132, -215, cls='only-b')
+    light(d, 60, -392, r=5)
+    # alcoba principal: closet al norte junto a la ventana, cama con cabecero al oriente
+    closet2(d, 380, -339, 529, -279, 's', 3, swings=det)
+    bed2(d, 339, -220, 529, -80, 'e')
+    d.a(rect(492, -259, 529, -223, 'loose') + rect(492, -77, 529, -41, 'loose'))
+    light(d, 405, -177)
+    # alcoba 2: cama contra el muro norte, closet sobre el muro sur
+    bed2(d, -246, -385, -56, -265, 'o')
+    closet2(d, -246, -165, -100, -105, 'n', 3, swings=det)
+    light(d, -131, -245)
+    # alcoba 3: cama al occidente, closet corredizo al oriente
+    bed2(d, -341, -30, -241, 160, 'n')
+    closet2(d, -195, 0, -140, 120, 'o', 2, sliding=True)
+    light(d, -240, 38)
+    if mode == 'full':
+        for name, dims, x, y in ROOM_LABELS:
+            d.t(x, y, name, size=0.82)
+            if dims:
+                d.t(x, y + d.fs * 1.05, dims, cls='dt lbd', size=0.78)
+        d.t(46, 246 + d.fs * 2.2, 'ENTRADA', size=0.78)
+        d.a(f'<path d="M36 {246 + d.fs * 0.6}H56L46 {246 + d.fs * 0.1}Z" class="arrow"/>')
     else:
-        top_left_dims(d, w, h)
+        fz = 0.72
+        d.t(330, 45, 'Nevera', size=fz)
+        d.t(385, 80, 'Torre', size=fz)
+        d.t(325, 160, 'Lavadora', size=fz)
+        d.t(381, 164, 'Lavadero', size=fz)
+        d.t(190, 36, 'Península', size=0.8, cls='lb only-b')
+        d.t(223, 72, 'Mesa Ø 0,90', size=fz, cls='lb only-a')
+        d.t(222, -273, 'Sofá', size=fz, rot=-90)
+        d.t(26, -230, 'TV', size=fz)
+        d.t(454, -305, 'Closet', size=fz)
+        d.t(-173, -130, 'Closet', size=fz)
+        d.t(-168, 60, 'Closet', size=fz, rot=-90)
 
 
-def draw_bath(d, detail):
-    w, h = 110, 210
-    d.floor(0, 0, w, h, 'tf')
-    d.walls(w, h)
-    d.a('<rect x="0" y="0" width="45" height="60" class="m-van ol"/><ellipse cx="24" cy="30" rx="13" ry="18" class="porc ol"/>')
-    d.a('<rect x="0" y="70" width="18" height="40" rx="2" class="porc ol"/><ellipse cx="43" cy="90" rx="25" ry="17" class="porc ol"/>')
-    d.a('<path d="M0 120H62" class="glass"/><path d="M48 124H110" class="glass"/>')
-    d.a('<circle cx="55" cy="182" r="4" class="drain"/><rect x="0" y="159" width="5" height="12" class="metal"/>')
-    if detail:
-        d.t(78, 34, 'Mueble 60', size=0.72, anchor='middle')
-        d.t(55, 150, 'Ducha', size=0.8)
-        top_left_dims(d, w, h)
-        xr = w + T + 0.9 * d.fs
-        d.dimv(0, 60, xr, '60', size=0.82, right=True)
-        d.dimv(60, 120, xr, '60', size=0.82, right=True)
-        d.dimv(120, 210, xr, '90', size=0.82, right=True)
-    else:
-        top_left_dims(d, w, h)
+def plan_svg(pid, crop, k, aria, mode='crop', dims=None, fs=10.5):
+    d = D(pid, crop, k, fs)
+    plan_content(d, mode)
+    if dims:
+        dims(d)
+    return d.svg(aria, cls='dw crop')
 
 
-def draw_master(d, detail):
-    w, h = 250, 338
-    d.floor(0, 0, w, h, 'spc')
-    d.walls(w, h)
-    nightstand(d, 10, 0)
-    nightstand(d, 200, 0)
-    bed(d, 55, 0, 140, 190, 'top')
-    closet(d, 0, 278, 250, 60, 5, swings=detail)
-    light(d, 125, 150)
-    top_left_dims(d, w, h)
-    if detail:
-        d.t(125, 120, 'Cama doble 1,40', size=0.8)
-        d.t(125, 318, 'Closet RH 2,50', size=0.85)
-        xr = w + T + 0.9 * d.fs
-        d.dimv(0, 190, xr, '1,90', size=0.82, right=True)
-        d.dimv(190, 278, xr, '88', size=0.82, right=True)
-        d.dimv(278, 338, xr, '60', size=0.82, right=True)
+def dims_kitchen(d):
+    yb = 246 + 0.9 * d.fs
+    x = 0
+    for wd in (92, 60, 60, 60, 23, 60, 50):
+        d.dimh(x, x + wd, yb, str(wd), size=0.8, below=True)
+        x += wd
+    d.dimh(0, 405, yb + 2.1 * d.fs, '4,05', below=True)
+    d.dimv(0, 230, -16 - 0.9 * d.fs, '2,30')
+    d.a('<g class="only-b">')
+    d.dimh(115, 265, -96, '1,50')
+    d.dimv(60, 170, 172, 'pasillo 1,10', size=0.78, right=True)
+    d.dimh(0, 115, 110, '1,15', size=0.78)
+    d.dimv(-30, 60, 115 - 0.7 * d.fs, '0,90', size=0.78)
+    d.a('</g>')
 
 
-def draw_bed2(d, detail):
-    w, h = 230, 280
-    d.floor(0, 0, w, h, 'spc')
-    d.walls(w, h)
-    bed(d, 0, 15, 120, 190, 'left')
-    closet(d, 0, 220, 160, 60, 3, swings=detail)
-    light(d, 115, 140)
-    top_left_dims(d, w, h)
-    if detail:
-        d.t(110, 80, 'Cama 1,20', size=0.8)
-        d.t(80, 257, 'Closet RH 1,60', size=0.8)
-        xr = w + T + 0.9 * d.fs
-        d.dimv(135, 220, xr, '85', size=0.82, right=True)
-        d.dimv(220, 280, xr, '60', size=0.82, right=True)
+def dims_sala(d):
+    d.dimv(-339, 0, -16 - 0.9 * d.fs, '3,40')
+    d.dimh(0, 265, -322, '2,65', below=True)
+    d.dimh(0, 200, -438 - 0.7 * d.fs, '2,00')
+    d.dimv(-438, -366, 219 + 0.9 * d.fs, '0,72', right=True, size=0.8)
 
 
-def draw_bed3(d, detail):
-    w, h = 200, 255
-    d.floor(0, 0, w, h, 'spc')
-    d.walls(w, h)
-    bed(d, 0, 0, 100, 190, 'left')
-    closet(d, 0, 195, 120, 60, 2, swings=detail)
-    light(d, 100, 128)
-    top_left_dims(d, w, h)
-    if detail:
-        d.t(108, 55, 'Cama 1,00', size=0.8)
-        d.t(60, 232, 'Closet 1,20', size=0.78)
-        xr = w + T + 0.9 * d.fs
-        d.dimv(0, 100, xr, '1,00', size=0.82, right=True)
-        d.dimv(100, 195, xr, '95', size=0.82, right=True)
-        d.dimv(195, 255, xr, '60', size=0.82, right=True)
-
-
-def draw_living(d, detail):
-    w, h = 265, 340
-    d.floor(0, 0, w, h, 'spc')
-    # balcón
-    by = h + T
-    d.a(f'<rect x="32" y="{by}" width="200" height="72" fill="url(#{d.pid}-tf)" class="ol"/>')
-    d.a(f'<path d="M32 {by + 72}H232" class="rail"/>')
-    d.walls(w, h, gaps=[('bottom', 45, 220)])
-    d.a(f'<path d="M45 {h + 3}H140" class="glass"/><path d="M125 {h + 7}H220" class="glass"/>')
-    round_table(d, 132, 88, 45)
-    sofa(d, 0, 182, 150, 85)
-    d.a('<rect x="255" y="195" width="10" height="120" class="m-clo ol"/>')
-    light(d, 132, 170, cls='only-a')
-    light(d, 132, 88, cls='only-b')
-    light(d, 175, 257, cls='only-b')
-    light(d, 60, by + 8, r=5)
-    top_left_dims(d, w, h)
-    if detail:
-        d.t(132, 92, 'Ø 0,90', size=0.75)
-        d.t(58, 257, 'Sofá 2 puestos', size=0.78, rot=-90)
-        d.t(242, 255, 'Panel TV', size=0.78, rot=-90)
-        d.t(132, by + 42, 'Balcón 2,00 × 0,72', size=0.8)
-        d.dimh(32, 232, by + 72 + 0.9 * d.fs, '2,00', size=0.82, below=True)
-        d.dimv(by, by + 72, w + T + 0.9 * d.fs, '72', size=0.82, right=True)
-
-
-def room_svg(pid, fn, w, h, k, fs, detail, aria, extra=(0, 0, 0, 0)):
-    d = plan_canvas(pid, w, h, k, fs, extra)
-    fn(d, detail)
-    return d.svg(aria)
+def dims_room(x0, y0, x1, y1, lx, ly):
+    def f(d):
+        d.dimh(x0, x1, y0 - 16 - 0.9 * d.fs, lx)
+        d.dimv(y0, y1, x0 - 16 - 0.9 * d.fs, ly)
+    return f
 
 
 # ---------------------------------------------------------------- alzados
@@ -390,182 +486,173 @@ def elev_frame(d, w):
     d.a(f'<rect x="{-T}" y="240" width="{w + 2 * T}" height="{T}" class="pc"/><rect x="{-T}" y="{-T}" width="{w + 2 * T}" height="{T}" class="pc"/>')
 
 
-def kitchen_elev():
-    k, fs = 1.62, 10.5
-    fsc = fs / k
-    L = T + 3.6 * fsc + 6
-    top = T + 2.4 * fsc
-    d = D('ke', (-L, -top, 405 + L + T + 8, 240 + top + T + 5.9 * fsc), k, fs)
-    sp = d.pat('sp', 60, 30, 'm-sp', 'j-sp', 70, Y(147))
-    d.a(f'<rect x="0" y="0" width="405" height="240" class="m-paint"/>')
-    # salpicadero
-    d.a(f'<rect x="70" y="{Y(147)}" width="270" height="57" fill="{sp}" class="eo"/>')
-    # luz LED bajo altos
-    d.a(f'<rect x="70" y="{Y(147)}" width="170" height="34" fill="url(#ke-led)"/>')
-    d.a(f'<rect x="300" y="{Y(147)}" width="40" height="34" fill="url(#ke-led)" class="only-a"/>')
-    # tomas
-    for x in (150, 215):
-        d.a(f'<rect x="{x}" y="{Y(116)}" width="8" height="12" rx="1" class="outlet"/>')
-    d.a(f'<rect x="318" y="{Y(116)}" width="8" height="12" rx="1" class="outlet only-a"/>')
-    for x in (84, 190, 272):
-        d.a(f'<rect x="{x}" y="{Y(116)}" width="8" height="12" rx="1" class="outlet only-b"/>')
-    # nevera propia
-    d.a(f'<rect x="3" y="{Y(178)}" width="64" height="178" rx="3" class="own-e"/>')
-    d.a(f'<path d="M3 {Y(118)}H67M58 {Y(160)}V{Y(130)}M58 {Y(106)}V{Y(70)}" class="own-e"/>')
-    d.t(35, Y(60), 'Nevera', cls='le', size=0.9)
-    # bajos
-    d.a(f'<rect x="70" y="{Y(10)}" width="270" height="10" class="zoc eo"/>')
-    fronts = []
-
-    def door(x, w, h0, h1, hinge='l', cls='m-lower'):
-        fronts.append((x, w, h0, h1, 'door', hinge, cls))
-
-    def drawer(x, w, h0, h1, cls='m-lower'):
-        fronts.append((x, w, h0, h1, 'drawer', None, cls))
-    door(70, 30, 10, 88, 'l'); door(100, 30, 10, 88, 'r')
-    door(130, 50, 10, 88, 'l')
-    drawer(180, 60, 10, 32); drawer(180, 60, 32, 60); drawer(180, 60, 60, 88)
-    drawer(240, 60, 10, 26)
-    s = ''
-    for x, w, h0, h1, kind, hinge, cls in fronts:
-        s += f'<rect x="{x + .4}" y="{Y(h1) + .4}" width="{w - .8}" height="{h1 - h0 - .8}" class="{cls} eo"/>'
-    d.a(s)
-    # horno bajo estufa
-    d.a(f'<rect x="240.4" y="{Y(88)}" width="59.2" height="61.6" class="steel eo"/>'
-        f'<rect x="248" y="{Y(76)}" width="44" height="34" rx="2" class="oven-win"/><path d="M250 {Y(82)}H290" class="hdl"/>')
-    # remate (A) / torre (B)
-    d.a(f'<g class="only-a"><rect x="300.4" y="{Y(88)}" width="39.2" height="77.6" class="m-lower eo"/></g>')
-    d.a(f'<g class="only-b"><rect x="300" y="{Y(222)}" width="40" height="212" class="m-lower eo"/>'
-        f'<path d="M300 {Y(150)}H340M300 {Y(88)}H340" class="eo"/><rect x="298" y="{Y(224)}" width="44" height="216" class="opt-mark"/></g>')
-    # mesón granito
-    d.a(f'<rect x="70" y="{Y(90)}" width="230" height="2.4" fill="url(#ke-gr)" class="eo"/>')
-    d.a(f'<rect x="300" y="{Y(90)}" width="40" height="2.4" fill="url(#ke-gr)" class="eo only-a"/>')
-    # estufa y grifería
-    d.a(f'<rect x="246" y="{Y(91.6)}" width="48" height="1.6" class="steel eo"/><path d="M252 {Y(92.6)}h8M280 {Y(92.6)}h8" class="hdl"/>')
-    d.a(f'<path d="M100 {Y(90)}V{Y(121)}Q100 {Y(129)} 108 {Y(129)}H111V{Y(123)}" class="faucet"/>')
-    # manijas A / perfil B
+def fronts_svg(fronts, gola_runs=()):
+    """fronts: (x, w, h0, h1, tipo, bisagra, clase). Devuelve frentes + manijas A + perfiles B."""
+    s = ''.join(f'<rect x="{x + .4}" y="{Y(h1) + .4}" width="{w - .8}" height="{h1 - h0 - .8}" class="{c} eo"/>'
+                for x, w, h0, h1, kind, hinge, c in fronts)
     ha = ''
-    for x, w, h0, h1, kind, hinge, cls in fronts:
+    for x, w, h0, h1, kind, hinge, c in fronts:
         if kind == 'door':
             hx = x + w - 4 if hinge == 'l' else x + 4
-            ha += f'<path d="M{hx} {Y(h1 - 6)}V{Y(h1 - 20)}" class="hdl"/>'
+            y0, y1 = (h1 - 6, h1 - 20) if hinge != 'up' else (h0 + 5, h0 + 17)
+            ha += f'<path d="M{hx} {Y(y0)}V{Y(y1)}" class="hdl"/>'
+        elif kind == 'udoor':
+            hx = x + w - 4 if hinge == 'l' else x + 4
+            ha += f'<path d="M{hx} {Y(h0 + 5)}V{Y(h0 + 17)}" class="hdl"/>'
         else:
             ha += f'<path d="M{x + w / 2 - 9} {Y(h1 - 5)}H{x + w / 2 + 9}" class="hdl"/>'
-    ha += f'<path d="M336 {Y(82)}V{Y(68)}" class="hdl"/>'
-    d.a(f'<g class="only-a">{ha}</g>')
-    d.a(f'<g class="only-b"><rect x="70" y="{Y(88)}" width="170" height="2" class="gola"/>'
-        f'<rect x="240" y="{Y(26)}" width="60" height="1.4" class="gola"/></g>')
-    # altos
-    up = []
-    up += [(70, 30, 147, 222, 'l'), (100, 30, 147, 222, 'r'), (130, 50, 147, 222, 'l'), (180, 30, 147, 222, 'l'), (210, 30, 147, 222, 'r')]
-    up += [(240, 60, 180, 222, 'l')]
-    s = ''
-    for x, w, h0, h1, hinge in up:
-        s += f'<rect x="{x + .4}" y="{Y(h1) + .4}" width="{w - .8}" height="{h1 - h0 - .8}" class="m-upper eo"/>'
-    d.a(s)
-    d.a(f'<g class="only-a"><rect x="300.4" y="{Y(222) + .4}" width="39.2" height="74.2" class="m-upper eo"/>'
-        f'<path d="M336 {Y(153)}V{Y(165)}" class="hdl"/></g>')
-    ha = ''
-    for x, w, h0, h1, hinge in up:
-        hx = x + w - 4 if hinge == 'l' else x + 4
-        ha += f'<path d="M{hx} {Y(h0 + 5)}V{Y(h0 + 17)}" class="hdl"/>'
-    d.a(f'<g class="only-a">{ha}</g>')
-    d.a(f'<g class="only-b"><rect x="70" y="{Y(149)}" width="170" height="1.6" class="gola"/></g>')
-    # campana
-    d.a(f'<path d="M244 {Y(180)}H296L294 {Y(166)}H246Z" class="steel eo"/>')
-    # tira LED
-    d.a(f'<path d="M70 {Y(147) + .8}H240" class="ledl"/><path d="M300 {Y(147) + .8}H340" class="ledl only-a"/>')
+    gb = ''.join(f'<rect x="{x0}" y="{Y(h)}" width="{x1 - x0}" height="1.6" class="gola"/>' for x0, x1, h in gola_runs)
+    return s + f'<g class="only-a">{ha}</g><g class="only-b">{gb}</g>'
+
+
+def kitchen_elev():
+    """Muro sur de cocina y ropas, visto desde la cocina (el oriente queda a la izquierda)."""
+    k, fs = 1.55, 10.5
+    fsc = fs / k
+    L = T + 3.6 * fsc + 6
+    top = T + 1.2 * fsc
+    d = D('ke', (-L, -top, 405 + L + T + 8, 240 + top + T + 5.9 * fsc), k, fs)
+    sp = d.pat('sp', 60, 30, 'm-sp', 'j-sp', 110, Y(147))
+    tw = d.pat('tw', 60, 30, 'm-tw', 'j-tw', 0, Y(120))
+    d.a('<rect x="0" y="0" width="405" height="240" class="m-paint"/>')
+    d.a(f'<rect x="0" y="{Y(120)}" width="110" height="120" fill="{tw}" class="eo"/>')
+    d.a(f'<rect x="110" y="{Y(147)}" width="203" height="57" fill="{sp}" class="eo"/>')
+    # ventana de ropas
+    d.a(f'<rect x="1" y="{Y(210)}" width="48" height="90" class="glass-e"/><path d="M25 {Y(210)}V{Y(120)}" class="eo"/>'
+        f'<rect x="-1" y="{Y(121)}" width="52" height="2" class="sill eo"/>')
+    # lavadero compacto y lavadora
+    d.a(f'<rect x="3" y="{Y(90)}" width="44" height="30" rx="2" class="lav eo"/><path d="M7 {Y(60)}V240M43 {Y(60)}V240" class="eo"/>'
+        f'<path d="M25 {Y(90)}V{Y(104)}Q25 {Y(110)} 31 {Y(110)}H33" class="faucet"/>')
+    d.a(f'<rect x="52" y="{Y(85)}" width="56" height="85" rx="3" class="own-e"/><circle cx="80" cy="{Y(48)}" r="17" class="own-e"/>'
+        f'<circle cx="80" cy="{Y(100)}" r="2.6" class="metal"/>')
+    # bajos
+    d.a(f'<rect x="110" y="{Y(10)}" width="203" height="10" class="zoc eo"/>')
+    fr = [(110, 23, 10, 88, 'door', 'r', 'm-lower'),
+          (193, 60, 10, 32, 'drawer', None, 'm-lower'), (193, 60, 32, 60, 'drawer', None, 'm-lower'), (193, 60, 60, 88, 'drawer', None, 'm-lower'),
+          (133, 60, 10, 26, 'drawer', None, 'm-lower'),
+          (253, 30, 10, 88, 'door', 'l', 'm-lower'), (283, 30, 10, 88, 'door', 'r', 'm-lower')]
+    d.a(fronts_svg(fr, [(110, 133, 88), (193, 313, 88), (133, 193, 26)]))
+    d.a(f'<rect x="133.4" y="{Y(88)}" width="59.2" height="61.6" class="steel eo"/>'
+        f'<rect x="141" y="{Y(76)}" width="44" height="34" rx="2" class="oven-win"/><path d="M143 {Y(82)}H183" class="hdl"/>')
+    d.a(f'<rect x="110" y="{Y(90)}" width="203" height="2.4" fill="url(#ke-gr)" class="eo"/>')
+    d.a(f'<rect x="139" y="{Y(91.6)}" width="48" height="1.6" class="steel eo"/><path d="M145 {Y(92.6)}h8M173 {Y(92.6)}h8" class="hdl"/>')
+    d.a(f'<path d="M283 {Y(90)}V{Y(121)}Q283 {Y(129)} 275 {Y(129)}H272V{Y(123)}" class="faucet"/>')
+    for x in (205, 240):
+        d.a(f'<rect x="{x}" y="{Y(116)}" width="8" height="12" rx="1" class="outlet"/>')
+    for x in (118, 298):
+        d.a(f'<rect x="{x}" y="{Y(116)}" width="8" height="12" rx="1" class="outlet only-b"/>')
+    # LED y altos
+    d.a(f'<rect x="50" y="{Y(147)}" width="83" height="34" fill="url(#ke-led)"/><rect x="193" y="{Y(147)}" width="120" height="34" fill="url(#ke-led)"/>')
+    ups = [(50, 42, 147, 222, 'udoor', 'l', 'm-upper'), (92, 41, 147, 222, 'udoor', 'r', 'm-upper'),
+           (133, 60, 180, 222, 'udoor', 'l', 'm-upper'),
+           (193, 30, 147, 222, 'udoor', 'l', 'm-upper'), (223, 30, 147, 222, 'udoor', 'r', 'm-upper'),
+           (253, 30, 147, 222, 'udoor', 'l', 'm-upper'), (283, 30, 147, 222, 'udoor', 'r', 'm-upper')]
+    d.a(fronts_svg(ups, [(50, 133, 148.6), (193, 313, 148.6)]))
+    d.a(f'<path d="M137 {Y(180)}H189L187 {Y(166)}H139Z" class="steel eo"/>')
+    d.a(f'<path d="M50 {Y(147) + .8}H133M193 {Y(147) + .8}H313" class="ledl"/>')
+    # puerta de entrada
+    d.a(f'<rect x="313" y="{Y(210)}" width="92" height="210" class="m-paint"/>'
+        f'<rect x="317" y="{Y(207)}" width="84" height="207" class="door eo"/><path d="M394 {Y(100)}H386" class="hdl-d"/>'
+        f'<path d="M313 {Y(210)}V240M405 {Y(210)}V240M313 {Y(210)}H405" class="eo"/>')
     elev_frame(d, 405)
-    # etiquetas y cotas
-    d.a(d.text(320, -T - 0.7 * d.fs, 'Torre despensa opcional', cls='dt', size=0.88).replace('class="dt"', 'class="dt only-b"'))
     yb = 240 + T + 1.5 * d.fs
-    x = 0
-    names = [('Nevera', 70), ('Lavaplatos', 60), ('Ajuste', 50), ('Cajonero', 60), ('Estufa', 60), ('Remate', 40)]
-    for nm, wd in names:
-        d.dimh(x, x + wd, yb, str(wd), size=0.85, below=False)
-        d.t(x + wd / 2, yb + d.fs * 1.15, nm if not (nm == 'Remate') else nm, cls='dn', size=0.8)
-        x += wd
-    d.a(d.text(320, yb + d.fs * 1.15, 'Torre', cls='dn only-b', size=0.8))
-    yb2 = yb + d.fs * 2.7
-    d.dimh(0, 340, yb2, 'Mueble lineal 3,40 (rango 3,20–3,60)', size=0.85, below=True)
+    for x0, wd, nm in ((0, 50, 'Lavadero'), (50, 60, 'Lavadora'), (110, 23, 'Rem.'), (133, 60, 'Estufa'),
+                       (193, 60, 'Cajonero'), (253, 60, 'Lavaplatos'), (313, 92, 'Entrada')):
+        d.dimh(x0, x0 + wd, yb, str(wd), size=0.8)
+        d.t(x0 + wd / 2, yb + d.fs * 1.15, nm, cls='dn', size=0.76)
+    d.dimh(110, 313, yb + d.fs * 2.7, 'Mueble 2,03', size=0.85, below=True)
     xl = -T - 0.9 * d.fs
     d.dimv(0, 240, xl - 1.6 * d.fs, '2,40 libre', size=0.85)
-    d.a(''.join([]))
-    lv = [(0, 90, '≈90'), (90, 147, '55–60'), (147, 222, '70–80')]
-    for h0, h1, lb in lv:
-        d.dimv(240 - h0, 240 - h1, xl, lb, size=0.8)
-    return d.svg('Vista frontal del muro de cocina: nevera, lavaplatos, módulo de ajuste, cajonero, estufa con horno y remate; muebles altos a 55–60 cm del mesón con tira LED debajo.')
+    for h0, h1, lb in ((0, 90, '≈90'), (90, 147, '55–60'), (147, 222, '70–80')):
+        d.dimv(240 - h0, 240 - h1, xl, lb, size=0.78)
+    return d.svg('Muro sur de la cocina visto desde adentro: lavadero bajo la ventana de ropas, lavadora, remate, estufa con horno y campana, cajonero, lavaplatos y la puerta de entrada.')
 
 
-def laundry_elev():
-    k, fs = 1.62, 10.5
+def peninsula_elev():
+    """Península de B: cara hacia la sala, corte y cara hacia la cocina."""
+    k, fs = 1.3, 10.5
     fsc = fs / k
-    L = T + 2.4 * fsc
-    d = D('re', (-L, -T - 4, 180 + L + 6, 240 + T + 4 + T + 3.2 * fsc), k, fs)
-    tw = d.pat('tw', 60, 30, 'm-tw', 'j-tw', 0, Y(120))
-    d.a('<rect x="0" y="0" width="180" height="240" class="m-paint"/>')
-    d.a(f'<rect x="0" y="{Y(120)}" width="150" height="120" fill="{tw}" class="eo"/>')
-    # gabinete alto de limpieza, junto a la ventana
-    d.a(f'<rect x="0" y="{Y(10)}" width="40" height="10" class="zoc eo"/>'
-        f'<rect x="0.4" y="{Y(205)}" width="39.2" height="195" class="m-lower eo"/><path d="M0 {Y(110)}H40" class="eo"/>')
-    d.a(f'<g class="only-a"><path d="M4 {Y(125)}V{Y(140)}M4 {Y(95)}V{Y(80)}" class="hdl"/></g>')
-    d.a(f'<g class="only-b"><rect x="0.4" y="{Y(205)}" width="39.2" height="1.6" class="gola"/></g>')
-    # lavadero compacto
-    d.a(f'<rect x="42" y="{Y(90)}" width="46" height="32" rx="2" class="lav eo"/><path d="M46 {Y(58)}V240M84 {Y(58)}V240" class="eo"/>'
-        f'<path d="M65 {Y(90)}V{Y(104)}Q65 {Y(110)} 71 {Y(110)}H73" class="faucet"/>')
-    # lavadora propia
-    d.a(f'<rect x="92" y="{Y(85)}" width="56" height="85" rx="3" class="own-e"/><circle cx="120" cy="{Y(48)}" r="17" class="own-e"/>')
-    d.a(f'<circle cx="120" cy="{Y(100)}" r="2.6" class="metal"/>')
-    d.a(f'<rect x="{-T}" y="0" width="{T}" height="240" class="pc"/>'
-        f'<rect x="{-T}" y="240" width="{190 + T}" height="{T}" class="pc"/><rect x="{-T}" y="{-T}" width="{190 + T}" height="{T}" class="pc"/>'
-        f'<path d="M180 {-T}L184 60L176 120L184 180L180 {240 + T}" class="brk"/>')
-    yb = 240 + T + 1.5 * d.fs
-    for x0, wd, nm in ((0, 40, 'Gabinete'), (40, 50, 'Lavadero'), (90, 60, 'Lavadora')):
-        d.dimh(x0, x0 + wd, yb, str(wd), size=0.85)
-        d.t(x0 + wd / 2, yb + d.fs * 1.15, nm, cls='dn', size=0.78)
-    d.dimv(240, 120, -T - 0.9 * d.fs, 'enchape 1,20', size=0.8)
-    return d.svg('Vista del muro de ropas: gabinete alto de limpieza junto a la ventana, lavadero compacto y lavadora, con enchape de 1,20 m de alto.')
+    d = D('pe', (-26, -8, 530, 240 + 8 + T + 4.7 * fsc), k, fs)
+    wpc = d.pat('wpc', 3, 240, 'm-wpc', 'j-wpc', 0, 0)
+    # suelo
+    d.a(f'<path d="M-20 240H525" class="eo2"/>')
+    # 1. cara hacia la sala (el oriente a la izquierda)
+    d.a(f'<rect x="0" y="{Y(88)}" width="150" height="78" fill="{wpc}" class="eo2"/><rect x="0" y="{Y(10)}" width="150" height="10" class="zoc eo2"/>')
+    d.a(f'<rect x="0" y="{Y(90)}" width="150" height="2.4" fill="url(#pe-gr)" class="eo2"/>')
+    for cx in (75, 125):
+        d.a(f'<path d="M{cx} 0V{Y(172)}" class="cable"/><path d="M{cx - 9} {Y(172)}H{cx + 9}L{cx + 13} {Y(158)}H{cx - 13}Z" class="shade"/>'
+            f'<ellipse cx="{cx}" cy="{Y(157)}" rx="11" ry="2.4" class="glow"/>')
+        d.a(f'<rect x="{cx - 18}" y="{Y(67)}" width="36" height="5" rx="2" class="stool"/>'
+            f'<path d="M{cx - 14} {Y(62)}L{cx - 17} 240M{cx + 14} {Y(62)}L{cx + 17} 240M{cx - 15} {Y(25)}H{cx + 15}" class="stool-l"/>')
+    d.t(75, 240 + T + 1.5 * d.fs, 'Hacia la sala', cls='dn', size=0.82)
+    d.dimh(0, 150, 240 + T + 2.9 * d.fs, '1,50', size=0.8, below=True)
+    # 2. corte (cocina a la izquierda, sala a la derecha)
+    ox = 205
+    d.a(f'<rect x="{ox}" y="{Y(88)}" width="60" height="78" class="m-lower eo2"/><rect x="{ox + 4}" y="{Y(10)}" width="54" height="10" class="zoc eo2"/>'
+        f'<path d="M{ox} {Y(60)}H{ox + 60}M{ox} {Y(32)}H{ox + 60}" class="eo2"/>'
+        f'<rect x="{ox + 58}" y="{Y(88)}" width="2" height="78" fill="{wpc}" class="eo2"/>'
+        f'<rect x="{ox - 1}" y="{Y(90)}" width="92" height="2.6" fill="url(#pe-gr)" class="eo2"/>')
+    d.a(f'<rect x="{ox + 84}" y="{Y(67)}" width="36" height="5" rx="2" class="stool"/>'
+        f'<path d="M{ox + 88} {Y(62)}L{ox + 85} 240M{ox + 116} {Y(62)}L{ox + 119} 240M{ox + 87} {Y(25)}H{ox + 117}" class="stool-l"/>')
+    d.t(ox + 45, 240 + T + 1.5 * d.fs, 'Corte', cls='dn', size=0.82)
+    d.dimh(ox, ox + 60, Y(90) - 0.7 * d.fs, '60', size=0.78)
+    d.dimh(ox + 60, ox + 90, Y(90) - 0.7 * d.fs, '30', size=0.78)
+    d.dimv(240, Y(90), ox - 0.7 * d.fs, '0,90', size=0.78)
+    d.t(ox + 30, Y(110), 'cocina', cls='dn', size=0.72)
+    d.t(ox + 100, Y(110), 'sala', cls='dn', size=0.72)
+    # 3. cara hacia la cocina (el occidente a la izquierda)
+    ox = 360
+    fr = [(ox, 50, 10, 88, 'door', 'l', 'm-lower'), (ox + 50, 50, 10, 32, 'drawer', None, 'm-lower'),
+          (ox + 50, 50, 32, 60, 'drawer', None, 'm-lower'), (ox + 50, 50, 60, 88, 'drawer', None, 'm-lower'),
+          (ox + 100, 50, 10, 88, 'door', 'r', 'm-lower')]
+    d.a(f'<rect x="{ox}" y="{Y(10)}" width="150" height="10" class="zoc eo2"/>')
+    d.a(fronts_svg(fr, [(ox, ox + 150, 88)]).replace(' eo"', ' eo2"'))
+    d.a(f'<rect x="{ox}" y="{Y(90)}" width="150" height="2.4" fill="url(#pe-gr)" class="eo2"/>')
+    d.t(ox + 75, 240 + T + 1.5 * d.fs, 'Hacia la cocina', cls='dn', size=0.82)
+    d.dimh(ox, ox + 150, 240 + T + 2.9 * d.fs, '1,50', size=0.8, below=True)
+    return d.svg('Península de 1,50 por 0,90 m: hacia la sala, frente en WPC acanalado con dos bancos y dos lámparas colgantes; en corte, 60 cm de mueble y 30 cm de voladizo a 90 cm de altura; hacia la cocina, puertas y cajones.')
 
 
 def bath_elev():
+    """Muro oriental de cada baño visto desde adentro: el norte (puerta) a la izquierda."""
     k, fs = 1.62, 10.5
     fsc = fs / k
     L = T + 2.4 * fsc
     d = D('be', (-L, -T - 4, 210 + L + T + 2.6 * fsc, 240 + T + 4 + T + 3.2 * fsc), k, fs)
     tw = d.pat('tw', 60, 30, 'm-tw', 'j-tw', 0, 0)
-    d.a(f'<rect x="0" y="0" width="210" height="240" fill="{tw}" class="eo"/>')
-    # ducha
-    d.a(f'<path d="M45 {Y(205)}V{Y(212)}" class="faucet"/><rect x="36" y="{Y(205)}" width="18" height="2.5" rx="1" class="metal"/>')
-    d.a(f'<circle cx="45" cy="{Y(110)}" r="5" class="metal"/><path d="M45 {Y(110)}L53 {Y(114)}" class="faucet"/>')
-    d.a(f'<rect x="88" y="{Y(200)}" width="3" height="200" class="glass-e"/>')
-    # sanitario
-    d.a(f'<rect x="100" y="{Y(78)}" width="40" height="34" rx="3" class="porc eo"/><rect x="114" y="{Y(80)}" width="12" height="2" class="metal"/>'
-        f'<path d="M103 {Y(42)}H137L131 {Y(0)}H109Z" class="porc eo"/><path d="M101 {Y(42)}H139" class="eo"/>')
-    # mueble flotante + espejo + luz
-    d.a(f'<rect x="150" y="{Y(87)}" width="60" height="3" class="porc eo"/><rect x="152" y="{Y(84)}" width="56" height="38" class="m-van eo"/>')
-    d.a(f'<g class="only-a"><path d="M175 {Y(78)}H185" class="hdl"/></g><g class="only-b"><rect x="152" y="{Y(84)}" width="56" height="1.4" class="gola"/></g>')
-    d.a(f'<path d="M180 {Y(87)}V{Y(100)}Q180 {Y(104)} 184 {Y(104)}H186" class="faucet"/>')
-    d.a(f'<rect x="156" y="{Y(176)}" width="48" height="70" rx="2" class="mirror eo"/>')
-    d.a(f'<rect x="156" y="{Y(176)}" width="48" height="26" fill="url(#be-led)"/>')
-    d.a(f'<rect x="160" y="{Y(182)}" width="40" height="3" rx="1" class="ledbar"/>')
+    g = [f'<rect x="0" y="0" width="210" height="240" fill="{tw}" class="eo"/>',
+         f'<path d="M45 {Y(205)}V{Y(212)}" class="faucet"/><rect x="36" y="{Y(205)}" width="18" height="2.5" rx="1" class="metal"/>',
+         f'<circle cx="45" cy="{Y(110)}" r="5" class="metal"/><path d="M45 {Y(110)}L53 {Y(114)}" class="faucet"/>',
+         f'<rect x="88" y="{Y(200)}" width="3" height="200" class="glass-e"/>',
+         f'<rect x="100" y="{Y(78)}" width="40" height="34" rx="3" class="porc eo"/><rect x="114" y="{Y(80)}" width="12" height="2" class="metal"/>'
+         f'<path d="M103 {Y(42)}H137L131 {Y(0)}H109Z" class="porc eo"/><path d="M101 {Y(42)}H139" class="eo"/>',
+         f'<rect x="150" y="{Y(87)}" width="60" height="3" class="porc eo"/><rect x="152" y="{Y(84)}" width="56" height="38" class="m-van eo"/>',
+         f'<g class="only-a"><path d="M175 {Y(78)}H185" class="hdl"/></g><g class="only-b"><rect x="152" y="{Y(84)}" width="56" height="1.4" class="gola"/></g>',
+         f'<path d="M180 {Y(87)}V{Y(100)}Q180 {Y(104)} 184 {Y(104)}H186" class="faucet"/>',
+         f'<rect x="156" y="{Y(176)}" width="48" height="70" rx="2" class="mirror eo"/>',
+         f'<rect x="156" y="{Y(176)}" width="48" height="26" fill="url(#be-led)"/>',
+         f'<rect x="160" y="{Y(182)}" width="40" height="3" rx="1" class="ledbar"/>']
+    d.a('<g transform="translate(210 0) scale(-1 1)">' + ''.join(g) + '</g>')
     elev_frame(d, 210)
     yb = 240 + T + 1.5 * d.fs
-    for x0, wd, nm in ((0, 90, 'Ducha'), (90, 60, 'Sanitario'), (150, 60, 'Mueble')):
+    for x0, wd, nm in ((0, 60, 'Mueble'), (60, 60, 'Sanitario'), (120, 90, 'Ducha')):
         d.dimh(x0, x0 + wd, yb, str(wd), size=0.85)
         d.t(x0 + wd / 2, yb + d.fs * 1.15, nm, cls='dn', size=0.8)
     xr = 210 + T + 0.9 * d.fs
     d.dimv(240, 40, xr, 'vidrio 8 mm · 2,00', size=0.8, right=True)
     d.dimv(240, 0, -T - 0.9 * d.fs, '2,40', size=0.85)
-    return d.svg('Vista del muro largo del baño: ducha con división de vidrio templado, sanitario y mueble flotante de 60 cm con espejo y luz frontal.')
+    return d.svg('Muro oriental del baño: mueble flotante de 60 cm con espejo y luz frontal junto a la puerta, sanitario y ducha al fondo con división de vidrio templado.')
 
 
 def closet_elev():
+    """Closet de la alcoba principal, 1,50 m junto a la ventana, sin puertas."""
     k, fs = 1.62, 10.5
     fsc = fs / k
     L = T + 2.4 * fsc
-    d = D('ce', (-L, -T - 4, 250 + L + T + 4, 240 + T + 4 + T + 3.2 * fsc), k, fs)
-    d.a('<rect x="0" y="0" width="250" height="240" class="m-cloin"/>')
-    d.a(f'<rect x="0" y="{Y(8)}" width="250" height="8" class="m-clo eo"/>')
+    W = 150
+    d = D('ce', (-L, -T - 4, W + L + T + 4, 240 + T + 4 + T + 3.2 * fsc), k, fs)
+    d.a(f'<rect x="0" y="0" width="{W}" height="240" class="m-cloin"/>')
+    d.a(f'<rect x="0" y="{Y(8)}" width="{W}" height="8" class="m-clo eo"/>')
 
     def shelf(x0, x1, h):
         return f'<rect x="{x0}" y="{Y(h) - 1}" width="{x1 - x0}" height="2" class="m-clo eo"/>'
@@ -577,67 +664,60 @@ def closet_elev():
         return f'<path d="M{x0 + 3} {Y(h)}H{x1 - 3}" class="rod-e"/>'
 
     def clothes(x0, x1, h, bottoms):
-        s = ''
-        n = len(bottoms)
-        step = (x1 - x0 - 8) / n
+        out = ''
+        step = (x1 - x0 - 8) / len(bottoms)
         for i, b in enumerate(bottoms):
             x = x0 + 4 + i * step + 1
-            s += f'<path d="M{x + step / 2 - 1} {Y(h)}V{Y(h - 3)}" class="eo"/>'
-            s += f'<rect x="{x:.1f}" y="{Y(h - 3)}" width="{step - 2.5:.1f}" height="{h - 3 - b}" rx="2" class="cloth"/>'
-        return s
+            out += f'<path d="M{x + step / 2 - 1} {Y(h)}V{Y(h - 3)}" class="eo"/>'
+            out += f'<rect x="{x:.1f}" y="{Y(h - 3)}" width="{step - 2.5:.1f}" height="{h - 3 - b}" rx="2" class="cloth"/>'
+        return out
 
     def drawers(x0, x1, hs):
-        s = ''
+        out = ''
         for h0, h1 in zip(hs, hs[1:]):
-            s += f'<rect x="{x0 + 1.5}" y="{Y(h1) + .6}" width="{x1 - x0 - 3}" height="{h1 - h0 - 1.2}" class="m-clo eo"/>'
-            s += f'<path d="M{(x0 + x1) / 2 - 7} {Y(h1 - 6)}H{(x0 + x1) / 2 + 7}" class="hdl"/>'
-        return s
+            out += f'<rect x="{x0 + 1.5}" y="{Y(h1) + .6}" width="{x1 - x0 - 3}" height="{h1 - h0 - 1.2}" class="m-clo eo"/>'
+            out += f'<path d="M{(x0 + x1) / 2 - 7} {Y(h1 - 6)}H{(x0 + x1) / 2 + 7}" class="hdl"/>'
+        return out
 
     def shoes(x0, x1, h):
-        s = ''
+        out = ''
         x = x0 + 5
         while x + 18 < x1:
-            s += f'<rect x="{x}" y="{Y(h + 9)}" width="7.5" height="8" rx="3" class="shoe"/><rect x="{x + 8.5}" y="{Y(h + 9)}" width="7.5" height="8" rx="3" class="shoe"/>'
+            out += (f'<rect x="{x}" y="{Y(h + 9)}" width="7.5" height="8" rx="3" class="shoe"/>'
+                    f'<rect x="{x + 8.5}" y="{Y(h + 9)}" width="7.5" height="8" rx="3" class="shoe"/>')
             x += 22
-        return s
+        return out
 
-    a = div(100) + div(150)
-    a += shelf(0, 100, 200) + rod(0, 100, 188) + clothes(0, 100, 188, [98, 110, 92, 120, 104, 96])
+    a = div(100)
+    a += shelf(0, 100, 200) + rod(0, 100, 188) + clothes(0, 100, 188, [112, 104, 118, 108, 120, 110])
+    a += shelf(0, 100, 34) + shelf(0, 100, 64) + shoes(0, 100, 10) + shoes(0, 100, 34) + shoes(0, 100, 64)
     a += drawers(100, 150, [8, 38, 68, 98]) + shelf(100, 150, 130) + shelf(100, 150, 165) + shelf(100, 150, 200)
-    a += shelf(150, 250, 200) + rod(150, 250, 188) + clothes(150, 250, 188, [112, 104, 118, 108, 120, 110])
-    a += shelf(150, 250, 34) + shelf(150, 250, 64) + shoes(150, 250, 10) + shoes(150, 250, 34) + shoes(150, 250, 64)
     d.a(f'<g class="only-a">{a}</g>')
-
-    b = div(100) + div(150) + div(200)
-    b += shelf(0, 250, 205)
-    for x in range(20, 250, 50):
+    b = div(50) + div(100) + shelf(0, W, 205)
+    for x in range(12, W, 50):
         b += ''.join(f'<rect x="{x + i * 3}" y="{Y(232)}" width="1.3" height="12" class="vent"/>' for i in range(4))
-    b += rod(0, 100, 196) + clothes(0, 100, 196, [132, 140, 128, 136, 130]) + rod(0, 100, 106) + clothes(0, 100, 106, [44, 52, 40, 48, 46])
-    b += drawers(100, 150, [8, 33, 58, 83, 108]) + shelf(100, 150, 140) + shelf(100, 150, 172)
-    for h in (8, 33, 58, 83, 108, 133):
-        if h > 8:
-            b += shelf(150, 200, h)
-        b += shoes(150, 200, h + (2 if h == 8 else 0))
-    b += rod(200, 250, 196) + clothes(200, 250, 196, [40, 52, 46])
+    b += rod(0, 50, 196) + clothes(0, 50, 196, [132, 140, 128]) + rod(0, 50, 106) + clothes(0, 50, 106, [44, 52, 40])
+    b += drawers(50, 100, [8, 33, 58, 83, 108]) + shelf(50, 100, 140) + shelf(50, 100, 172)
+    b += shelf(100, 150, 36) + shelf(100, 150, 62) + shoes(100, 150, 10) + shoes(100, 150, 36) + shoes(100, 150, 62)
+    b += rod(100, 150, 196) + clothes(100, 150, 196, [80, 88, 76])
     d.a(f'<g class="only-b">{b}</g>')
-    d.a(d.text(125, Y(220), 'Maletero', cls='le', size=0.85).replace('class="le"', 'class="le only-b"'))
-    elev_frame(d, 250)
+    d.a(d.text(75, Y(220), 'Maletero', cls='le', size=0.85).replace('class="le"', 'class="le only-b"'))
+    elev_frame(d, W)
     yb = 240 + T + 1.5 * d.fs
-    ga = ''
-    gb = ''
-    for x0, wd, nm in ((0, 100, 'Colgado'), (100, 50, 'Cajones'), (150, 100, 'Colgado + zapatero')):
+    ga = gb = ''
+    for x0, wd, nm in ((0, 100, 'Colgado + zapatero'), (100, 50, 'Cajones')):
         dd = D('x', (0, 0, 1, 1), k, fs)
         dd.dimh(x0, x0 + wd, yb, str(wd), size=0.85)
-        dd.t(x0 + wd / 2, yb + d.fs * 1.15, nm, cls='dn', size=0.8)
+        dd.t(x0 + wd / 2, yb + d.fs * 1.15, nm, cls='dn', size=0.78)
         ga += ''.join(dd.p)
-    for x0, wd, nm in ((0, 100, 'Doble colgado'), (100, 50, 'Cajones'), (150, 50, 'Zapatero'), (200, 50, 'Colgado')):
+    for x0, wd, nm in ((0, 50, 'Doble'), (50, 50, 'Cajones'), (100, 50, 'Zapatos')):
         dd = D('x', (0, 0, 1, 1), k, fs)
         dd.dimh(x0, x0 + wd, yb, str(wd), size=0.85)
-        dd.t(x0 + wd / 2, yb + d.fs * 1.15, nm, cls='dn', size=0.8)
+        dd.t(x0 + wd / 2, yb + d.fs * 1.15, nm, cls='dn', size=0.78)
         gb += ''.join(dd.p)
     d.a(f'<g class="only-a">{ga}</g><g class="only-b">{gb}</g>')
     d.dimv(240, 0, -T - 0.9 * d.fs, '2,40 piso-techo', size=0.85)
-    return d.svg('Interior del closet de la alcoba principal, 2,50 m: en A colgado, cajones y zapatero; en B doble colgado, cajones, zapatero, colgado largo, maletero y ventilación.')
+    return d.svg('Interior del closet de 1,50 m de la alcoba principal: en A colgado con zapatero y cajones; en B doble colgado, cajones, zapatero con colgado medio, maletero y ventilación.')
 
 
 # ---------------------------------------------------------------- piezas HTML
@@ -704,16 +784,16 @@ RENDER_NOTE = ('<p class="disc">Renders generados por computador con las medidas
                'Muebles sueltos, nevera y lavadora son de referencia, la ubicación de ventanas es supuesta y los colores son aproximados.</p>')
 
 ALT = {
-    'cocina': ('Render de la cocina en la opción A: altos blanco mate, bajos taupe con manijas negras, mesón de granito negro y piso SPC roble claro.',
-               'Render de la cocina en la opción B: altos blanco cálido, bajos gris piedra con perfil de aluminio, torre de despensa y piso SPC roble natural.'),
-    'ropas': ('Render de la zona de ropas en la opción A, vista desde el lavaplatos: piso cerámico, lavadora, lavadero y gabinete alto junto a la ventana.',
-              'Render de la zona de ropas en la opción B, vista desde el lavaplatos, con gabinete gris piedra y piso cerámico gris.'),
-    'sala': ('Render de la sala-comedor en la opción A: mesa redonda, sofá de dos puestos, panel de TV y puerta-ventana al balcón.',
-             'Render de la sala-comedor en la opción B, con piso roble natural y dos luces de techo.'),
-    'bano': ('Render del baño en la opción A: enchape claro, mueble flotante taupe, grifería negro mate y división de vidrio.',
-             'Render del baño en la opción B: mueble en roble natural y grifería inoxidable.'),
-    'alcoba': ('Render de la alcoba principal en la opción A: closet piso-techo blanco con cinco puertas y manijas negras.',
-               'Render de la alcoba principal en la opción B: closet piso-techo en roble natural con rejillas de ventilación.'),
+    'cocina': ('Render de la cocina en la opción A vista desde la sala: mesa redonda para 4 y mueble sobre el muro sur con altos blanco mate y bajos taupe.',
+               'Render de la cocina en la opción B vista desde la sala: península con frente en WPC acanalado, dos bancos y colgantes, y el mueble gris piedra al fondo.'),
+    'ropas': ('Render de la cocina en la opción A desde la entrada: mesón a la derecha, nevera y torre al fondo y ropas bajo su ventana.',
+              'Render de la cocina en la opción B desde la entrada: mesón a la derecha, península a la izquierda, nevera, torre y ropas al fondo.'),
+    'sala': ('Render de la sala-comedor en la opción A desde la cocina: mesa redonda, sofá contra el muro oriental, TV y puerta-ventana al balcón.',
+             'Render de la sala-comedor en la opción B desde la cocina: península en primer plano, sofá, TV y puerta-ventana al balcón.'),
+    'bano': ('Render del baño principal en la opción A desde la puerta: mueble flotante taupe, sanitario y ducha con ventana al fondo.',
+             'Render del baño principal en la opción B desde la puerta: mueble en roble natural y grifería inoxidable.'),
+    'alcoba': ('Render de la alcoba principal en la opción A: closet blanco de 1,50 m junto a la ventana y cama con cabecero al oriente.',
+               'Render de la alcoba principal en la opción B: closet en roble natural con rejillas de ventilación junto a la ventana.'),
 }
 
 MATROWS = [
@@ -744,6 +824,9 @@ MATROWS = [
     ('Muros de baños', 'Y enchape de ropas a 1,20 m',
      ('tw-a', 'Cerámica clara 30 × 60', 'Impermeabilización debajo.'),
      ('tw-b', 'Cerámica clara 30 × 60', 'Impermeabilización con prueba y acta.')),
+    ('Frente de la península', 'Cara hacia la sala',
+     ('none', 'Sin península', 'En A el comedor es una mesa redonda para 4.'),
+     ('wpc-b', 'WPC acanalado roble natural', 'Frente y costado de la península hacia la sala.')),
     ('Herrajes y grifería', 'Manijas, barras y griferías',
      ('metal-a', 'Negro mate', 'Manijas, grifería y barras de closet.'),
      ('metal-b', 'Inoxidable y perfil de aluminio', 'Cocina con perfil tipo gola, sin manijas.')),
@@ -752,6 +835,9 @@ MATROWS = [
 
 def mcard(opt, spec):
     sid, name, note_ = spec
+    if sid == 'none':
+        return (f'<figure class="mcard {opt} mnone"><div class="mph">No aplica</div>'
+                f'<figcaption><span class="mname"><span class="optchip {opt}">{opt.upper()}</span><b>{name}</b></span><small>{note_}</small></figcaption></figure>')
     return (f'<figure class="mcard {opt}"><img src="img/m-{sid}.jpg" width="640" height="480" alt="Muestra: {esc(name)}" loading="lazy" decoding="async">'
             f'<figcaption><span class="mname"><span class="optchip {opt}">{opt.upper()}</span><b>{name}</b></span><small>{note_}</small></figcaption></figure>')
 
@@ -762,42 +848,25 @@ mat_rows_html = ''.join(
 
 GALLERY = f'''
 <div class="gal">
-  <button type="button" class="gal-main" data-go="sala">{img_ab('sala', *ALT['sala'], eager=True)}<span class="gal-cap">Sala-comedor y balcón</span></button>
+  <button type="button" class="gal-main" data-go="sala">{img_ab('sala', *ALT['sala'], eager=True)}<span class="gal-cap">Sala-comedor hacia el balcón</span></button>
   <div class="gal-grid">
     <button type="button" class="gal-t" data-go="cocina">{img_ab('cocina', *ALT['cocina'], w=640, h=400, prefix='t-')}<span class="gal-cap">Cocina</span></button>
-    <button type="button" class="gal-t" data-go="cocina">{img_ab('ropas', *ALT['ropas'], w=640, h=400, prefix='t-')}<span class="gal-cap">Ropas</span></button>
+    <button type="button" class="gal-t" data-go="cocina">{img_ab('ropas', *ALT['ropas'], w=640, h=400, prefix='t-')}<span class="gal-cap">Desde la entrada</span></button>
     <button type="button" class="gal-t" data-go="banos">{img_ab('bano', *ALT['bano'], w=640, h=400, prefix='t-')}<span class="gal-cap">Baño</span></button>
     <button type="button" class="gal-t" data-go="alcobas">{img_ab('alcoba', *ALT['alcoba'], w=640, h=400, prefix='t-')}<span class="gal-cap">Alcoba principal</span></button>
   </div>
 </div>'''
 
 # ---------------------------------------------------------------- dibujos
-K_SHEET, FS_SHEET = 0.62, 10.5
-K_DET, FS_DET = 0.92, 10.5
-K_BED = 0.8
-
-sheet = [
-    ('Cocina-ropas', '4,05 × 2,30', '9,32', room_svg('s1', draw_kitchen, 405, 230, K_SHEET, FS_SHEET, False, 'Planta cocina-ropas 4,05 por 2,30 m')),
-    ('Sala-comedor y balcón', '2,65 × 3,40 · balcón 2,00 × 0,72', '9,01 + 1,44', room_svg('s2', draw_living, 265, 340, K_SHEET, FS_SHEET, False, 'Planta sala-comedor 2,65 por 3,40 m con balcón', extra=(0, 0, 0, 82))),
-    ('Baño principal', '1,10 × 2,10', '2,31', room_svg('s6', draw_bath, 110, 210, K_SHEET, FS_SHEET, False, 'Planta baño principal 1,10 por 2,10 m')),
-    ('Baño auxiliar', '1,10 × 2,10', '2,31', room_svg('s7', draw_bath, 110, 210, K_SHEET, FS_SHEET, False, 'Planta baño auxiliar 1,10 por 2,10 m')),
-    ('Alcoba principal', '2,50 × 3,38', '8,45', room_svg('s3', draw_master, 250, 338, K_SHEET, FS_SHEET, False, 'Planta alcoba principal 2,50 por 3,38 m')),
-    ('Alcoba 2', '2,30 × 2,80', '6,44', room_svg('s4', draw_bed2, 230, 280, K_SHEET, FS_SHEET, False, 'Planta alcoba 2, 2,30 por 2,80 m')),
-    ('Alcoba 3', '2,00 × 2,55', '5,10', room_svg('s5', draw_bed3, 200, 255, K_SHEET, FS_SHEET, False, 'Planta alcoba 3, 2,00 por 2,55 m')),
-]
-sheet_html = '<div class="sheet">' + ''.join(
-    f'<figure class="rm">{svg}<figcaption><b>{n}</b><span class="mono">{dm} m · {ar} m²</span></figcaption></figure>'
-    for n, dm, ar, svg in sheet) + '</div>'
-
-kp_fs = K_DET
-kitchen_plan = room_svg('kp', draw_kitchen, 405, 230, 1.0, FS_DET, True, 'Planta de cocina-ropas: mueble lineal de 3,40 m sobre el muro superior, pasillo de 1,10 m y zona de ropas en el muro opuesto', extra=(0, 1.4 * FS_DET / 1.0, 1.5 * FS_DET / 1.0, 1.4 * FS_DET / 1.0))
-bath_plan = room_svg('bp', draw_bath, 110, 210, K_DET, FS_DET, True, 'Planta de baño 1,10 por 2,10 m: mueble, sanitario y ducha sobre el muro izquierdo', extra=(0, 0, 1.5 * FS_DET / K_DET, 0))
-master_plan = room_svg('ap1', draw_master, 250, 338, K_BED, FS_DET, True, 'Planta alcoba principal con cama doble y closet de 2,50 m', extra=(0, 0, 1.5 * FS_DET / K_BED, 0))
-bed2_plan = room_svg('ap2', draw_bed2, 230, 280, K_BED, FS_DET, True, 'Planta alcoba 2 con cama de 1,20 y closet de 1,60 m', extra=(0, 0, 1.5 * FS_DET / K_BED, 0))
-bed3_plan = room_svg('ap3', draw_bed3, 200, 255, K_BED, FS_DET, True, 'Planta alcoba 3 con cama de 1,00 y closet de 1,20 m', extra=(0, 0, 1.5 * FS_DET / K_BED, 0))
-living_plan = room_svg('sl', draw_living, 265, 340, 1.0, FS_DET, True, 'Planta sala-comedor con mesa redonda para 4, sofá de 2 puestos, panel de TV y balcón', extra=(0, 0, 1.5 * FS_DET, 82 + 1.6 * FS_DET))
-
-KE, RE, BE, CE = kitchen_elev(), laundry_elev(), bath_elev(), closet_elev()
+PLAN_FULL = plan_svg('pl', (-385, -470, 960, 790), 0.84, 'Planta completa del Apto 901, espejo del Tipo A: alcobas 2 y 3 y baño auxiliar al occidente, sala-comedor con balcón al norte, cocina abierta a la sala con entrada por el sur, alcoba principal, baño y ropas al oriente.', mode='full')
+PLAN_COCINA = plan_svg('pk', (-45, -130, 495, 440), 1.3, 'Planta de la cocina: mueble de 2,03 m sobre el muro sur entre la entrada y ropas, nevera y torre al frente; en B, península de 1,50 por 0,90 m hacia la sala con dos bancos y pasillo de 1,10 m.', dims=dims_kitchen)
+PLAN_SALA = plan_svg('ps', (-50, -480, 370, 540), 0.95, 'Planta de la sala-comedor: sofá contra el muro oriental, TV en el muro occidental y balcón al norte.', dims=dims_sala)
+PLAN_AP = plan_svg('pa', (232, -395, 343, 428), 0.95, 'Planta de la alcoba principal: closet de 1,50 m junto a la ventana norte y cama con cabecero al oriente.', dims=dims_room(281, -339, 529, -15, '2,50', '3,38'))
+PLAN_A2 = plan_svg('p2', (-298, -442, 318, 367), 0.95, 'Planta de la alcoba 2: cama contra el muro norte y closet de 1,45 m sobre el muro sur.', dims=dims_room(-246, -385, -16, -105, '2,30', '2,80'))
+PLAN_A3 = plan_svg('p3', (-398, -140, 288, 355), 0.95, 'Planta de la alcoba 3: cama al occidente y closet corredizo de 1,20 m al oriente.', dims=dims_room(-341, -90, -140, 166, '2,00', '2,55'))
+PLAN_BP = plan_svg('pb', (368, -52, 205, 330), 1.15, 'Planta del baño principal: mueble, sanitario y ducha sobre el muro oriental, ventana en la ducha.', dims=dims_room(421, 1, 529, 230, '1,10', '2,10'))
+PLAN_BA = plan_svg('pu', (-178, -38, 200, 316), 1.15, 'Planta del baño auxiliar: mueble, sanitario y ducha sobre el muro oriental, ventana en la ducha.', dims=dims_room(-125, 15, -16, 230, '1,10', '2,10'))
+KE, PE, BE, CE = kitchen_elev(), peninsula_elev(), bath_elev(), closet_elev()
 
 # ---------------------------------------------------------------- presupuesto
 CH = [
@@ -809,6 +878,7 @@ CH = [
     ('Dos baños completos', (6.3, 7.0), (7.3, 8.5), 'Impermeabilización, enchapes, sanitarios, muebles y divisiones', 'Impermeabilización reforzada y griferías definidas'),
     ('Closets de tres alcobas', (3.1, 3.5), (3.8, 4.6), 'Melamina RH, almacenamiento y herrajes', 'Distribución interna, herrajes y remates'),
     ('Eléctrico, iluminación, drywall y balcón', (1.6, 2.2), (2.2, 3.0), 'Puntos seleccionados, luminarias y acabados de balcón', 'Más circuitos, puntos y control de luz'),
+    ('Península 1,50 × 0,90 (solo B) *', None, (2.0, 3.5), 'No aplica en A', 'Estimado propio: mueble RH, granito, frente WPC, toma y colgantes'),
 ]
 SCALE = 10.0
 
@@ -823,6 +893,14 @@ def rng(lo, hi):
 
 rows = ''
 for name, a, b, sa, sb in CH:
+    if a is None:
+        db = (b[0] + b[1]) / 2
+        bb = f'<span class="rb b" style="left:{b[0] / SCALE * 100:.2f}%;width:{(b[1] - b[0]) / SCALE * 100:.2f}%" title="Opción B · {name}: {rng(*b)}"></span>'
+        rows += (f'<tr><td class="cap"><b>{name}</b><small>{sa}. <span class="bsum">B: {sb}.</span></small></td>'
+                 f'<td class="trk"><div class="track">{bb}</div></td>'
+                 f'<td class="num va">—</td><td class="num vb">{rng(*b)}</td>'
+                 f'<td class="num dl">+{mm(db)}</td></tr>')
+        continue
     da = (a[0] + a[1]) / 2
     db = (b[0] + b[1]) / 2
     delta = db - da
@@ -966,7 +1044,7 @@ svg.dw *{vector-effect:non-scaling-stroke}
 .hid{fill:none;stroke:var(--d-line);stroke-width:1;stroke-dasharray:4 3;opacity:.75}
 .trans{fill:none;stroke:var(--d-trans);stroke-width:1.6;stroke-dasharray:6 3}
 .own{fill:none;stroke:var(--d-line);stroke-width:1.2;stroke-dasharray:5 3}
-.loose rect,.loose circle,rect.loose{fill:var(--d-loose);stroke:var(--d-line);stroke-width:1.1}
+.loose rect,.loose circle,rect.loose,circle.loose{fill:var(--d-loose);stroke:var(--d-line);stroke-width:1.1}
 .loose .fold{fill:none;stroke:var(--d-line);stroke-width:.8}
 .rod{fill:none;stroke:var(--d-line);stroke-width:1;stroke-dasharray:2 3}
 .front{stroke:var(--d-line);stroke-width:2.2}
@@ -998,6 +1076,24 @@ svg.dw *{vector-effect:non-scaling-stroke}
 .shoe{fill:var(--m-shoe)}
 .vent{fill:var(--m-e-line);opacity:.55}
 .brk{fill:none;stroke:var(--d-dim);stroke-width:1}
+svg.dw.crop{overflow:hidden}
+.win{fill:var(--card);stroke:var(--d-line);stroke-width:.8}
+.leaf{stroke:var(--d-line);stroke-width:1.5;fill:none}
+.duct{fill:var(--line);stroke:var(--d-line);stroke-width:1}
+.duct-x{stroke:var(--d-line);stroke-width:.6;fill:none}
+.arrow{fill:var(--d-line)}
+.lbd{fill:var(--muted)}
+.sill{fill:var(--m-paint)}
+.door{fill:var(--m-door)}
+.hdl-d{stroke:var(--m-steel);stroke-width:2.6;stroke-linecap:round;fill:none}
+.eo2{stroke:var(--d-line);stroke-width:1}
+path.eo2:not([class*="m-"]){fill:none}
+.m-wpc{fill:var(--m-wpc)} .j-wpc{stroke:var(--m-wpc-j);stroke-width:.7;fill:none}
+.cable{stroke:var(--d-line);stroke-width:.8;fill:none}
+.shade{fill:var(--m-metal);stroke:var(--d-line);stroke-width:.8}
+.glow{fill:var(--m-led)}
+.stool{fill:var(--d-loose);stroke:var(--d-line);stroke-width:1.1}
+.stool-l{stroke:var(--d-line);stroke-width:1.4;fill:none}
 
 :root:not([data-opt="b"]) .only-b{display:none}
 :root[data-opt="b"] .only-a{display:none}
@@ -1132,56 +1228,57 @@ tabs_html = ''.join(
 V = {}
 
 V['resumen'] = f'''
-<div class="kicker">Propuesta de acabados · 29 sep 2026</div>
-<h2>Dos opciones sobre la <span class="em">misma distribución</span></h2>
-<p class="sub">La propuesta conserva la distribución del Tipo A. No hay cambios estructurales, de fachada, de ductos comunes ni de redes sin autorización. Entre A y B cambia cuánto se invierte en lo que no se ve: impermeabilización, herrajes, circuitos y garantías.</p>
+<div class="kicker">Tu elección · Opción B con península</div>
+<h2>La Mejorada, con <span class="em">península</span> hacia la sala</h2>
+<p class="sub">Todo sigue el plano real del Apto 901, espejo del Tipo A. La península de 1,50 × 0,90 m separa la cocina de la sala y sirve de barra para dos personas. El resto de la Opción B no cambia. La A queda como referencia para comparar.</p>
 {GALLERY}
-<p class="disc">Renders ilustrativos de la opción <span class="only-a">A</span><span class="only-b">B</span>. Cambia de opción arriba para ver la otra, o toca una imagen para ir a ese espacio.</p>
+<p class="disc">Renders ilustrativos de la opción <span class="only-a">A, con mesa de comedor</span><span class="only-b">B, con península</span>. Cambia de opción arriba para ver la otra, o toca una imagen para ir a ese espacio.</p>
+
+<div class="reco">
+  <div class="tag">Decisión</div>
+  <h3>B mejorada + península</h3>
+  <p>Una península de 1,50 × 0,90 m en el límite entre cocina y sala. Tiene 60 cm de mueble del lado de la cocina y 30 cm de voladizo del lado de la sala, con mesón de granito y frente en WPC acanalado.</p>
+  <ol class="five">
+    <li><b>Pasillo de 1,10 m</b>Entre la península y el mesón, y 1,15 m libres desde la entrada.<br><button type="button" data-go="planta">Ver en Planta</button></li>
+    <li><b>Agua y gas en su sitio</b>Lavaplatos y estufa donde Inacar deja las redes.<br><button type="button" data-go="cocina">Ver en Cocina</button></li>
+    <li><b>Nevera y torre al frente</b>Contra el muro de la alcoba principal, junto a ropas.<br><button type="button" data-go="cocina">Ver en Cocina</button></li>
+    <li><b>Barra para dos</b>Reemplaza la mesa de comedor, con dos lámparas colgantes.<br><button type="button" data-go="sala">Ver en Sala</button></li>
+    <li><b>Puerta de la alcoba libre</b>El voladizo va solo donde están los bancos.<br><button type="button" data-go="cocina">Ver en Cocina</button></li>
+  </ol>
+  <div class="ceiling">Total estimado: <span>$34,0–39,0 M sin electrodomésticos</span><span>$36,0–41,0 M con electrodomésticos</span></div>
+</div>
+{note('blue', 'i', '<b>La península no está en la propuesta.</b> El documento no la cotiza por separado. Sumo un estimado propio de $2,0–3,5 M para mueble RH, granito, frente en WPC, toma y lámparas. Pide que la coticen como capítulo aparte.')}
 
 <div class="opts">
   <div class="oc" data-opt-card="a">
-    <span class="oh"><span class="optchip a">A</span><h3>Optimizada</h3><button type="button" class="pick" data-opt-set="a" aria-pressed="true"><span class="only-a">Viendo A</span><span class="only-b">Ver con A</span></button></span>
+    <span class="oh"><span class="optchip a">A</span><h3>Optimizada</h3><button type="button" class="pick" data-opt-set="a" aria-pressed="false"><span class="only-a">Viendo A</span><span class="only-b">Ver con A</span></button></span>
     <span class="amts"><span><small>Sin electrodomésticos</small><span class="amt">$28,5–32,0 M</span></span><span><small>Con electrodomésticos</small><span class="amt">$30,5–34,0 M</span></span></span>
-    <p>Cálida, contemporánea y práctica. <b>Mejor para:</b> primera inversión, arriendo de calidad o presupuesto contenido. <b>Riesgo si se ejecuta mal:</b> ahorrar en sellos, herrajes o redes ocultas.</p>
+    <p>Cálida y práctica, con mesa de comedor para 4. <b>Mejor para:</b> primera inversión, arriendo de calidad o presupuesto contenido.</p>
     {swatches(SWATCH_A, MAT_A)}
   </div>
   <div class="oc" data-opt-card="b">
-    <span class="oh"><span class="optchip b">B</span><h3>Mejorada</h3><button type="button" class="pick" data-opt-set="b" aria-pressed="false"><span class="only-b">Viendo B</span><span class="only-a">Ver con B</span></button></span>
-    <span class="amts"><span><small>Sin electrodomésticos</small><span class="amt">$32,0–35,5 M</span></span><span><small>Con electrodomésticos</small><span class="amt">$34,0–37,5 M</span></span></span>
-    <p>Sobria y de mayor detalle. <b>Mejor para:</b> vivienda propia a largo plazo y menor riesgo de reprocesos. <b>Riesgo si se ejecuta mal:</b> pagar extras por decorativos si no se controla el alcance.</p>
+    <span class="oh"><span class="optchip b">B</span><h3>Mejorada + península</h3><button type="button" class="pick" data-opt-set="b" aria-pressed="true"><span class="only-b">Viendo B</span><span class="only-a">Ver con B</span></button></span>
+    <span class="amts"><span><small>Sin electrodomésticos</small><span class="amt">$34,0–39,0 M</span></span><span><small>Con electrodomésticos</small><span class="amt">$36,0–41,0 M</span></span></span>
+    <p>Sobria y de mayor detalle, con impermeabilización probada, herrajes de marca, circuitos dedicados y garantías. <b>Incluye</b> las cinco protecciones que la propuesta pedía para la A reforzada.</p>
     {swatches(SWATCH_B, MAT_B)}
   </div>
 </div>
 
-<div class="reco">
-  <div class="tag">Recomendación de la propuesta</div>
-  <h3>Opción A reforzada</h3>
-  <p>Usa el presupuesto de la A como techo y adopta cinco protecciones de la B. Así el dinero va a lo que no se ve pero evita daños, sin agrandar la decoración.</p>
-  <ol class="five">
-    <li><b>Impermeabilización con prueba de estanqueidad</b>Baños, ropas y balcón, con acta.<br><button type="button" data-go="banos">Ver en Baños</button></li>
-    <li><b>SPC con ficha técnica</b>Marca, capa de uso, base IXPE y garantía.<br><button type="button" data-go="planta">Ver en Planta</button></li>
-    <li><b>Herrajes de marca</b>Bisagras y correderas con referencia y garantía.<br><button type="button" data-go="cocina">Ver en Cocina</button></li>
-    <li><b>Circuitos eléctricos definidos</b>Horno, nevera, lavadora y pequeños electrodomésticos.<br><button type="button" data-go="cocina">Ver en Cocina</button></li>
-    <li><b>Garantías y actas de entrega</b>Por capítulo, con saldo retenido.<br><button type="button" data-go="obra">Ver en Obra</button></li>
-  </ol>
-  <div class="ceiling">Techo de referencia: <span>$32,0 M sin electrodomésticos</span><span>$34,0 M con electrodomésticos</span></div>
-</div>
-
 <div class="grid2">
   <div class="card"><h3>Cambios frente a la versión anterior</h3><ul>
-    <li><b>Baño principal:</b> antes se convertía en vestier. La propuesta lo deja como baño completo, así que quedan dos baños.</li>
-    <li><b>Cocina:</b> lineal sobre un muro, sin península ni barra fija.</li>
-    <li><b>Pisos:</b> SPC en zonas secas y cerámica antideslizante en baños, ropas y balcón. Antes era porcelanato símil madera.</li>
-    <li><b>Presupuesto:</b> $28,5–32,0 M sin electrodomésticos. Antes el nivel recomendado era $25–28 M.</li>
+    <li><b>Plano real:</b> dibujos y renders siguen ahora el plano comercial del 901, con puertas, ventanas y ductos en su sitio.</li>
+    <li><b>Cocina:</b> el mueble va sobre el muro sur, entre la entrada y ropas, y mide 2,03 m. La nevera y la torre pasan al frente.</li>
+    <li><b>Península en B:</b> 1,50 × 0,90 m hacia la sala, en lugar de la mesa de comedor.</li>
+    <li><b>Closets:</b> en el plano caben unos 1,50 m en la principal (la propuesta decía 2,50), 1,45 m en la alcoba 2 y 1,20 m en la alcoba 3.</li>
   </ul></div>
   <div class="card"><h3>Criterios de diseño</h3><ul>
-    <li><b>Cocina:</b> mueble lineal. Sin península fija para circular cómodo en 2,30 m de ancho.</li>
+    <li><b>Redes:</b> lavaplatos, estufa y lavadero se quedan donde Inacar deja agua, desagüe y gas.</li>
     <li><b>Material húmedo:</b> melamina RH, cantos PVC y sellos sanitarios; impermeabilización bajo enchapes.</li>
-    <li><b>Iluminación:</b> base LED de 3.000–4.000 K, luz de tarea en cocina y baño.</li>
+    <li><b>Iluminación:</b> base LED de 3.000–4.000 K, luz de tarea en cocina y baño, colgantes sobre la barra.</li>
     <li><b>Prioridad:</b> durabilidad, ventilación, redes bien hechas y almacenaje antes que decoración voluminosa.</li>
   </ul></div>
 </div>
-{note('', '!', '<b>Aviso de precisión.</b> Las vistas y la propuesta son conceptuales. El plano comercial da medidas aproximadas: no se debe fabricar carpintería, cortar piedra ni mover redes sin medir el apartamento en obra gris.')}
+{note('', '!', '<b>Aviso de precisión.</b> Las vistas son conceptuales y el plano comercial da medidas aproximadas. No se debe fabricar carpintería, cortar piedra ni mover redes sin medir el apartamento en obra gris.')}
 '''
 
 V['materiales'] = f'''
@@ -1196,22 +1293,22 @@ V['materiales'] = f'''
 '''
 
 V['planta'] = f'''
-<div class="kicker">Planta · 44,30 m² privados · altura libre 2,40 m</div>
-<h2>Cada espacio a la misma escala</h2>
-<p class="sub">Medidas del plano comercial y amoblamiento de la propuesta. La posición de los espacios en la lámina es esquemática; puertas y ventanas no se dibujan, salvo la puerta-ventana del balcón. Para la ubicación real usa el plano comercial.</p>
-{sheet_html}
+<div class="kicker">Planta · Apto 901 · espejo del Tipo A · 44,30 m²</div>
+<h2>El apartamento completo, a escala</h2>
+<p class="sub">Redibujado del plano comercial, con puertas, ventanas y ductos en su sitio. El amoblamiento cambia con la opción: <span class="only-b">en B aparece la península con dos bancos</span><span class="only-a">en A aparece la mesa redonda para 4</span>. Las medidas son las del plano comercial hasta hacer el levantamiento con láser.</p>
+<div class="figs">{fig(PLAN_FULL, '<b>Planta del Apto 901.</b> Norte arriba, con el balcón. La entrada es por el sur, junto al baño auxiliar.', 'panel')}</div>
 {LEG_PLAN}
 <div class="block"><h3>Base de diseño</h3>
 <div class="tbl"><table>
 <thead><tr><th>Espacio</th><th class="num">Medidas (m)</th><th class="num">Área</th><th>Piso</th><th>Qué se hace</th></tr></thead>
 <tbody>
-<tr><td class="z">Alcoba principal</td><td class="num">2,50 × 3,38</td><td class="num">8,45 m²</td><td>SPC</td><td>Closet RH de 2,50 m</td></tr>
-<tr><td class="z">Alcoba 2</td><td class="num">2,30 × 2,80</td><td class="num">6,44 m²</td><td>SPC</td><td>Closet RH de 1,60 m</td></tr>
-<tr><td class="z">Alcoba 3</td><td class="num">2,00 × 2,55</td><td class="num">5,10 m²</td><td>SPC</td><td>Closet RH de 1,20 m</td></tr>
+<tr><td class="z">Alcoba principal</td><td class="num">2,50 × 3,38</td><td class="num">8,45 m²</td><td>SPC</td><td>Closet RH de 1,50 m junto a la ventana</td></tr>
+<tr><td class="z">Alcoba 2</td><td class="num">2,30 × 2,80</td><td class="num">6,44 m²</td><td>SPC</td><td>Closet RH de 1,45 m junto a la puerta</td></tr>
+<tr><td class="z">Alcoba 3</td><td class="num">2,00 × 2,55</td><td class="num">5,10 m²</td><td>SPC</td><td>Closet RH corredizo de 1,20 m</td></tr>
 <tr><td class="z">Baño principal</td><td class="num">1,10 × 2,10</td><td class="num">2,31 m²</td><td>Cerámica 30 × 30</td><td>Baño completo</td></tr>
 <tr><td class="z">Baño auxiliar</td><td class="num">1,10 × 2,10</td><td class="num">2,31 m²</td><td>Cerámica 30 × 30</td><td>Baño completo (Inacar lo entrega terminado)</td></tr>
-<tr><td class="z">Cocina-ropas</td><td class="num">4,05 × 2,30</td><td class="num">9,32 m²</td><td>SPC + cerámica en ropas</td><td>Cocina lineal RH y zona de ropas</td></tr>
-<tr><td class="z">Sala-comedor</td><td class="num">2,65 × 3,40</td><td class="num">9,01 m²</td><td>SPC</td><td>Panel de TV y luz</td></tr>
+<tr><td class="z">Cocina-ropas</td><td class="num">4,05 × 2,30</td><td class="num">9,32 m²</td><td>SPC + cerámica en ropas</td><td>Mueble de 2,03 m, nevera y torre al frente<span class="only-b">, península 1,50 × 0,90</span></td></tr>
+<tr><td class="z">Sala-comedor</td><td class="num">2,65 × 3,40</td><td class="num">9,01 m²</td><td>SPC</td><td>Panel de TV y luz<span class="only-b">; barra con dos bancos</span></td></tr>
 <tr><td class="z">Balcón</td><td class="num">2,00 × 0,72</td><td class="num">1,44 m²</td><td>Cerámica antideslizante</td><td>Sellos, luz exterior y pintura</td></tr>
 </tbody>
 <tfoot><tr><td colspan="2">Espacios interiores medidos</td><td class="num">42,9 m²</td><td colspan="2" style="font-weight:400;color:var(--muted)">La diferencia con 44,30 m² es circulación y muros.</td></tr></tfoot>
@@ -1228,57 +1325,56 @@ V['planta'] = f'''
 
 V['cocina'] = f'''
 <div class="kicker">Cocina y ropas · 4,05 × 2,30 m</div>
-<h2>Cocina lineal sobre un muro, <span class="em">sin península</span></h2>
-<p class="sub">Se elimina la península de 1,50 × 0,90 m para dejar un pasillo de 90 a 110 cm. En este esquema la zona de ropas va en el muro de enfrente, que es lo que deja el pasillo en 1,10 m. Confirma la posición real de los puntos de agua y gas antes de diseñar.</p>
+<h2>Mueble sobre el muro sur <span class="em only-b">y península hacia la sala</span><span class="em only-a">y mesa hacia la sala</span></h2>
+<p class="sub">La cocina se abre a la sala en 2,65 m. El mueble va entre la puerta de entrada y ropas, donde Inacar deja el agua y el gas. <span class="only-b">En B, la península de 1,50 × 0,90 m cierra la cocina hacia la sala y deja 1,10 m de pasillo.</span><span class="only-a">En A, el comedor es una mesa redonda para 4 en ese mismo lugar.</span></p>
 <div class="shots2">
-{shot('cocina', *ALT['cocina'], '<b>Cocina.</b> Mesón en granito, salpicadero 30 × 60 y altos a 55–60 cm del mesón. <span class="only-a">Manijas negro mate.</span><span class="only-b">Perfil de aluminio sin manijas y torre de despensa al fondo.</span>')}
-{shot('ropas', *ALT['ropas'], '<b>Cocina y ropas</b> desde el lavaplatos: cerámica con perfil de transición, lavadora, lavadero y gabinete junto a la ventana.')}
+{shot('cocina', *ALT['cocina'], '<b>Desde la sala.</b> <span class="only-b">Península con frente en WPC, dos bancos y colgantes; atrás, el mueble sobre el muro sur.</span><span class="only-a">Mesa redonda para 4 y, atrás, el mueble sobre el muro sur.</span>')}
+{shot('ropas', *ALT['ropas'], '<b>Desde la entrada.</b> Mesón a la derecha y, al fondo, nevera, torre y ropas bajo su ventana. <span class="only-b">A la izquierda, el mueble de la península.</span>')}
 </div>
 {RENDER_NOTE}
-<div class="figs">
-  {fig(KE, '<b>Vista frontal del muro de cocina.</b> Mesón a ≈90 cm, altos a 55–60 cm del mesón y tira LED 3.000 K debajo. <span class="only-b">En B, la torre de despensa (punteada) solo va si la medida conserva pasillo y ventilación de la nevera.</span>', 'panel')}
-</div>
-<div class="legend">{sw('upper', 'Altos blanco mate', 'Altos blanco cálido')}{sw('lower', 'Bajos taupe / moca claro', 'Bajos gris piedra suave')}{sw('ctr', 'Granito Negro San Gabriel', 'Granito o superficie compacta')}{sw('sp', 'Salpicadero 30 × 60')}{sw('metal', 'Manijas negro mate', 'Perfil de aluminio')}{sw('led', 'LED 3.000 K')}</div>
-{note('blue', 'i', '<b>Los módulos no llenan el mueble.</b> Nevera, lavaplatos, cajonero, estufa y remate suman 2,50–2,90 m, y el mueble lineal previsto mide 3,20–3,60 m. En el dibujo esa diferencia va en un módulo de ajuste de 50 cm. Defínelo con la medida láser antes del despiece.')}
-<div class="figs">
-  {fig(kitchen_plan, '<b>Planta.</b> Los altos se marcan punteados sobre el mesón. La línea café punteada es la transición de SPC a cerámica en ropas.', 'panel')}
-  {fig(RE, '<b>Muro de ropas</b>, visto desde la cocina. Gabinete alto junto a la ventana, lavadero compacto y lavadora, con enchape de 1,20 m.', 'panel')}
-</div>
+<div class="figs">{fig(PLAN_COCINA, '<b>Planta.</b> <span class="only-b">Península de 1,50 × 0,90 m: 60 cm de mueble y 30 cm de voladizo solo en el tramo de los bancos. </span>La línea café punteada es la transición de SPC a cerámica en ropas.', 'panel')}</div>
+<div class="figs">{fig(KE, '<b>Muro sur visto desde la cocina.</b> El mueble mide 2,03 m: lavaplatos, cajonero, estufa con horno y un remate de 23 cm. Ropas queda bajo su ventana y la entrada al otro extremo.', 'panel')}</div>
+<div class="figs only-b">{fig(PE, '<b>Península.</b> Hacia la sala, frente en WPC acanalado con dos bancos y dos lámparas colgantes. En corte, 60 cm de mueble y 30 cm de voladizo a 90 cm. Hacia la cocina, puertas y cajones.', 'panel')}</div>
+<div class="legend">{sw('upper', 'Altos blanco mate', 'Altos blanco cálido')}{sw('lower', 'Bajos taupe / moca claro', 'Bajos gris piedra suave')}{sw('ctr', 'Granito Negro San Gabriel', 'Granito o superficie compacta')}{sw('sp', 'Salpicadero 30 × 60')}{sw('metal', 'Manijas negro mate', 'Perfil de aluminio')}<span class="only-b">{sw('wpc', 'WPC acanalado')}</span>{sw('led', 'LED 3.000 K')}</div>
+{note('blue', 'i', '<b>El mueble lineal es más corto de lo que suponía la propuesta.</b> El documento habla de 3,20–3,60 m. En el plano real, entre la entrada y ropas caben 2,03 m, así que la nevera y la torre pasan al frente, contra el muro de la alcoba principal.<span class="only-b"> La península suma 1,50 m de mesón.</span>')}
+<div class="only-b">{note('', '!', '<b>La propuesta pedía no instalar península en B.</b> Su razón era no bloquear la circulación. En este plano la península queda en el límite con la sala, con 1,10 m de pasillo y 1,15 m libres desde la entrada. El voladizo va solo en el tramo de los bancos para no estorbar la puerta de la alcoba principal.')}</div>
 <div class="block"><h3>Especificación · Opción A</h3>
 {spec_table([
-    ('Distribución', 'Cocina lineal de 3,20–3,60 ml sobre un muro. Mesón de 60 cm de fondo. Pasillo objetivo de 90–110 cm. Sin península fija.'),
-    ('Módulos bajos', 'Nevera 60–70 cm; lavaplatos 60 cm; cajonero 40–60 cm; módulo estufa 60 cm; remate/despensa 30–40 cm. Ajuste final a medida real.'),
+    ('Distribución', 'Mueble de 2,03 m sobre el muro sur, entre la entrada y ropas. Nevera y gabinete alto al frente. Mesón de 60 cm, pasillo de 1,10 m y mesa redonda para 4.'),
+    ('Módulos bajos', 'Lavaplatos 60 cm, cajonero 60 cm, estufa 60 cm y remate 23 cm. Al frente, nevera de 70 cm y gabinete alto de 40 cm.'),
     ('Carpintería', 'Aglomerado RH 18 mm; canto PVC mínimo 1 mm y 2 mm en frentes y bordes expuestos; patas regulables; zócalo PVC/aluminio; bandeja antiderrame bajo lavaplatos.'),
-    ('Muebles altos', 'Blanco mate, fondo 30–35 cm, altura 70–80 cm, a 55–60 cm sobre el mesón; bisagras de cierre suave.'),
+    ('Muebles altos', 'Blanco mate, fondo 30–35 cm, altura 70–80 cm, a 55–60 cm sobre el mesón; bisagras de cierre suave. Siguen sobre la lavadora.'),
     ('Herrajes', 'Bisagras de cierre suave de marca definida; correderas telescópicas de extensión total; carga reforzada en el cajón de ollas.'),
     ('Mesón', 'Granito Negro San Gabriel pulido, 2 cm, sellado, recortes limpios, borde pulido y silicona neutra antihongos.'),
     ('Salpicadero', 'Cerámica blanca o marmolizada 30 × 60 cm desde el mesón hasta los muebles altos.'),
     ('Lavaplatos', 'Acero inoxidable profundo de 60 × 40 cm aprox.; sifón accesible, válvulas de paso y grifería monomando de cuello alto.'),
-    ('Ropas', 'Lavadero compacto, espacio para lavadora, enchape de 1,20 m, piso antideslizante y gabinete alto de limpieza.'),
+    ('Ropas', 'Lavadero compacto bajo la ventana, espacio para lavadora al lado, enchape de 1,20 m y piso antideslizante.'),
     ('Iluminación', 'Tira LED 3.000 K bajo altos con perfil de aluminio y difusor; luz general LED y tomas sobre el salpicadero.'),
 ])}
 </div>
-{b_block('Qué mejora B en cocina y ropas', [
+{b_block('Qué cambia en B, con la península', [
+    ('Península de 1,50 × 0,90 m: mueble RH de 60 cm con puertas y cajones hacia la cocina, granito con voladizo de 30 cm para dos bancos y frente en WPC acanalado hacia la sala.', False),
+    ('Una toma doble en la península y dos lámparas colgantes en un circuito propio.', False),
+    ('Torre de despensa y limpieza de 40 cm junto a la nevera, con organizadores.', False),
     ('Circuitos dedicados para horno, cocina si aplica, lavadora, nevera y pequeños electrodomésticos; tablero y cableado revisados por electricista.', True),
     ('Correderas de extensión total y carga reforzada. No aceptar “cierre suave” sin marca, referencia o garantía.', True),
-    ('Melamina RH 18 mm con cantos de 2 mm en frentes; organizador de cubiertos, gaveta profunda de ollas, bandeja extraíble de aseo y divisores.', False),
+    ('Melamina RH 18 mm con cantos de 2 mm; organizador de cubiertos, gaveta profunda de ollas y bandeja extraíble de aseo.', False),
     ('Mesón en granito de primera selección con sellado documentado, o superficie equivalente con ficha técnica.', False),
-    ('Torre de despensa o módulo alto solo si la medida final conserva pasillo y ventilación de la nevera.', False),
     ('Reserva para extractor con salida permitida o, si no hay salida, campana de recirculación con filtros reemplazables.', False),
-    ('Luz por escenas: general, bajo muebles, sala-comedor y baño, en circuitos independientes.', False),
 ])}
 '''
 
 V['banos'] = f'''
 <div class="kicker">Baños · 2 × (1,10 × 2,10 m)</div>
 <h2>Dos baños completos con la misma disposición</h2>
-<p class="sub">En este esquema el mueble, el sanitario y la ducha van sobre el muro largo, con la ducha al fondo detrás de una división corrediza en vidrio templado de 8 mm. Verifica la posición del desagüe del sanitario y del sifón de la ducha en obra.</p>
-{shot('bano', *ALT['bano'], '<b>Baño</b> visto desde la puerta. Enchape claro 30 × 60, piso antideslizante, mueble flotante con espejo y luz, y división corrediza. <span class="only-a">Grifería negro mate.</span><span class="only-b">Grifería inoxidable y mueble en roble natural.</span>')}
+<p class="sub">En los dos baños el mueble, el sanitario y la ducha van sobre el muro oriental, con la ducha al fondo junto al ducto y una ventana alta. La puerta entra por el norte. Verifica en obra la posición de los desagües.</p>
+{shot('bano', *ALT['bano'], '<b>Baño principal</b> desde la puerta. Enchape claro 30 × 60, piso antideslizante, mueble flotante con espejo y luz, y división corrediza. <span class="only-a">Grifería negro mate.</span><span class="only-b">Grifería inoxidable y mueble en roble natural.</span>')}
 {RENDER_NOTE}
-<div class="figs">
-  {fig(bath_plan, '<b>Planta.</b> Piso cerámico antideslizante 30 × 30.', 'panel')}
-  {fig(BE, '<b>Muro largo.</b> Enchape claro 30 × 60, mueble flotante RH de 60 cm, espejo con luz frontal.', 'panel')}
+<div class="figs panel">
+  {fig(PLAN_BP, '<b>Baño principal.</b> Entra desde la alcoba principal.')}
+  {fig(PLAN_BA, '<b>Baño auxiliar.</b> Entra desde el hall de las alcobas.')}
 </div>
+<div class="figs">{fig(BE, '<b>Muro oriental.</b> Mueble flotante RH de 60 cm junto a la puerta, sanitario y ducha al fondo.', 'panel')}</div>
 <div class="legend">{sw('tw', 'Enchape de muro 30 × 60')}{sw('tf', 'Piso antideslizante 30 × 30')}{sw('van', 'Mueble RH taupe', 'Mueble RH roble natural')}{sw('metal', 'Grifería negro mate', 'Grifería y herrajes inoxidables')}{sw('glass', 'Vidrio templado 8 mm')}</div>
 <div class="block"><h3>Especificación · Opción A</h3>
 {spec_table([
@@ -1301,23 +1397,24 @@ V['banos'] = f'''
 
 V['alcobas'] = f'''
 <div class="kicker">Alcobas · closets en melamina RH</div>
-<h2>Closets ajustados a la cama y a la circulación</h2>
-<p class="sub">Los closets van contra un muro corto con puertas batientes piso-techo cuando la apertura lo permite; si no, corredizas. Las camas se dibujan solo como referencia de espacio y no hacen parte del presupuesto.</p>
-{shot('alcoba', *ALT['alcoba'], '<b>Alcoba principal.</b> Closet piso-techo de 2,50 m con cinco puertas. <span class="only-a">Melamina blanco cálido y manijas negro mate.</span><span class="only-b">Melamina roble natural, perfil de aluminio y rejillas de ventilación.</span>')}
+<h2>Closets donde caben en el plano real</h2>
+<p class="sub">En la principal, 1,50 m junto a la ventana; en la alcoba 2, 1,45 m junto a la puerta; en la alcoba 3, 1,20 m con puertas corredizas, porque la cama queda cerca. Las camas son referencia de espacio y no hacen parte del presupuesto.</p>
+{shot('alcoba', *ALT['alcoba'], '<b>Alcoba principal.</b> Closet piso-techo de 1,50 m junto a la ventana y cama con cabecero al oriente. <span class="only-a">Melamina blanco cálido y manijas negro mate.</span><span class="only-b">Melamina roble natural, perfil de aluminio y rejillas de ventilación.</span>')}
 {RENDER_NOTE}
 <div class="figs panel">
-  {fig(master_plan, '<b>Alcoba principal</b> · 2,50 × 3,38 m. Cama doble 1,40 y 88 cm libres frente al closet.')}
-  {fig(bed2_plan, '<b>Alcoba 2</b> · 2,30 × 2,80 m. Cama 1,20 y closet de 1,60 m.')}
-  {fig(bed3_plan, '<b>Alcoba 3</b> · 2,00 × 2,55 m. Cama 1,00 contra el muro y closet de 1,20 m.')}
+  {fig(PLAN_AP, '<b>Alcoba principal</b> · 2,50 × 3,38 m.')}
+  {fig(PLAN_A2, '<b>Alcoba 2</b> · 2,30 × 2,80 m.')}
+  {fig(PLAN_A3, '<b>Alcoba 3</b> · 2,00 × 2,55 m.')}
 </div>
 <div class="figs">
-  {fig(CE, '<b>Interior del closet de la alcoba principal</b>, sin puertas. <span class="only-a">Opción A: barra de colgar, cajones útiles y zapatero.</span><span class="only-b">Opción B: doble colgado, cajones, zapatero, colgado largo, maletero y rejillas de ventilación.</span>', 'panel')}
+  {fig(CE, '<b>Interior del closet de la alcoba principal</b>, sin puertas. <span class="only-a">Opción A: colgado con zapatero abajo y cajones.</span><span class="only-b">Opción B: doble colgado, cajones, zapatero con colgado medio, maletero y rejillas de ventilación.</span>', 'panel')}
 </div>
 <div class="legend">{sw('clo', 'Melamina RH blanco cálido (sugerido)', 'Melamina RH roble natural (sugerido)')}{sw('metal', 'Barras y manijas negro mate', 'Barras y herrajes inoxidables')}</div>
+{note('blue', 'i', '<b>Los closets son más cortos que en la propuesta.</b> El documento dice 2,50 m en la principal, pero en ese muro está la ventana. En el plano caben unos 4,15 m lineales entre las tres alcobas, contra 5,30 m de la propuesta. Pide que ajusten la cotización a esas medidas.')}
 <div class="block"><h3>Especificación · Opción A</h3>
 {spec_table([
-    ('Alcoba principal', 'Closet RH de 2,50 m aprox., puertas batientes piso-techo según altura final, barra de colgar, cajones útiles y zapatero.'),
-    ('Alcobas 2 y 3', 'Closets RH ajustados a cama y circulación: 1,60 m y 1,20 m como referencia. Priorizar puertas batientes si permiten apertura.'),
+    ('Alcoba principal', 'Closet RH piso-techo con puertas batientes, barra de colgar, cajones útiles y zapatero. Unos 1,50 m junto a la ventana.'),
+    ('Alcobas 2 y 3', 'Closets RH ajustados a cama y circulación: 1,45 m con batientes en la alcoba 2 y 1,20 m con corredizas en la alcoba 3.'),
 ])}
 </div>
 {b_block('Qué mejora B en closets', [
@@ -1329,21 +1426,22 @@ V['alcobas'] = f'''
 
 V['sala'] = f'''
 <div class="kicker">Sala-comedor 2,65 × 3,40 m · balcón 2,00 × 0,72 m</div>
-<h2>Zona social liviana, sin muebles sobredimensionados</h2>
-<p class="sub">Mesa redonda compacta para cuatro en vez de barra dentro de la cocina, sofá de dos puestos y panel de TV liviano. <span class="only-a">Una luz central.</span><span class="only-b">En B la luz se separa en dos escenas: comedor y sala.</span></p>
-{shot('sala', *ALT['sala'], '<b>Sala-comedor</b> hacia el balcón. Mesa redonda para 4, sofá de 2 puestos y panel de TV. <span class="only-b">Dos luces de techo, una por escena.</span>')}
+<h2>Sala hacia el balcón, <span class="em only-b">comedor en la barra</span><span class="em only-a">comedor junto a la cocina</span></h2>
+<p class="sub">Sofá de 2 puestos contra el muro de la alcoba principal y TV en el muro de la alcoba 2, frente a frente. La puerta-ventana de 2,00 m da al balcón. <span class="only-b">El comedor pasa a la barra de la península, con dos bancos.</span><span class="only-a">El comedor es una mesa redonda para 4 junto a la cocina.</span></p>
+{shot('sala', *ALT['sala'], '<b>Sala-comedor</b> desde la cocina, hacia el balcón. <span class="only-b">En primer plano, la península.</span><span class="only-a">En primer plano, la mesa de comedor.</span>')}
 {RENDER_NOTE}
 <div class="figs">
-  {fig(living_plan, '<b>Planta.</b> El balcón conserva su baranda y fachada; solo se interviene piso, sellos, luz y pintura.', 'panel')}
+  {fig(PLAN_SALA, '<b>Planta.</b> El balcón conserva su baranda y fachada; solo se interviene piso, sellos, luz y pintura.', 'panel')}
   <div class="card" style="flex:1 1 280px;min-width:0"><h3>Especificación · Opción A</h3><ul>
     <li><b>Sala-comedor:</b> sofá de 2 puestos, mesa redonda compacta para 4, panel de TV liviano y luz central.</li>
     <li><b>Balcón:</b> piso antideslizante, sellos perimetrales, luz exterior y pintura para exterior. Respetar el reglamento de fachada.</li>
-    <li><b>Cielo raso:</b> cajillo simple solo si la altura final lo admite, con luz indirecta discreta. Con 2,40 m libres, cualquier descuelgue se nota.</li>
+    <li><b>Cielo raso:</b> cajillo simple solo si la altura final lo admite. Con 2,40 m libres, cualquier descuelgue se nota.</li>
   </ul>
-  {b_block('Qué mejora B aquí', [
+  {b_block('Qué cambia en B aquí', [
+      ('Barra de la península para dos bancos en lugar de la mesa de comedor. Si necesitas 4 puestos, suma una mesa plegable.', False),
       ('Impermeabilización del balcón con prueba de estanqueidad antes del enchape.', True),
       ('SPC con ficha técnica y base acústica.', True),
-      ('Circuito propio de luz para sala-comedor, con control de escena.', False),
+      ('Circuito propio de luz para la sala y otro para las colgantes de la barra.', False),
   ])}
   </div>
 </div>
@@ -1362,11 +1460,13 @@ V['presupuesto'] = f'''
 <tbody>
 <tr><td>Subtotal de capítulos</td><td class="num ca">$26,1–30,5 M</td><td class="num cb">$31,5–38,4 M</td></tr>
 <tr><td>A: imprevistos 8–10% · B: ajuste de alcance</td><td class="num ca">+$2,1–3,0 M</td><td class="num cb">−$0,5–2,9 M</td></tr>
-<tr class="big"><td>Total sin electrodomésticos</td><td class="num ca">$28,5–32,0 M</td><td class="num cb">$32,0–35,5 M</td></tr>
+<tr><td>Península 1,50 × 0,90 (estimado propio) *</td><td class="num ca">—</td><td class="num cb">+$2,0–3,5 M</td></tr>
+<tr class="big"><td>Total sin electrodomésticos</td><td class="num ca">$28,5–32,0 M</td><td class="num cb">$34,0–39,0 M</td></tr>
 <tr><td>Electrodomésticos (estufa, campana y horno)</td><td class="num ca">$1,8–2,3 M</td><td class="num cb">$2,0–2,5 M</td></tr>
-<tr class="big"><td>Total con electrodomésticos</td><td class="num ca">$30,5–34,0 M</td><td class="num cb">$34,0–37,5 M</td></tr>
+<tr class="big"><td>Total con electrodomésticos</td><td class="num ca">$30,5–34,0 M</td><td class="num cb">$36,0–41,0 M</td></tr>
 </tbody></table></div>
-<p class="disc">Los totales son el objetivo de contratación del documento y no la suma exacta de los rangos. Los imprevistos de A se usan solo para contingencias aprobadas. En B, el ajuste de alcance simplifica decorativos para no pasar del objetivo.</p>
+<p class="disc">Los totales son el objetivo de contratación del documento y no la suma exacta de los rangos. En B, el total suma la península a los $32,0–35,5 M de la propuesta. * La propuesta no cotiza la península: el valor es un estimado propio para pedir cotización.</p>
+<p class="disc">Con el plano real, los closets suman unos 4,15 m lineales contra 5,30 m de la propuesta, y el mueble sobre el muro sur mide 2,03 m. Pide que ajusten esos capítulos a las medidas reales.</p>
 </div>
 <div class="grid2">
   <div class="card"><h3>No incluido por defecto</h3><ul>
@@ -1487,7 +1587,7 @@ JS = r'''
   function setOpt(o){
     root.setAttribute('data-opt',o);
     [].forEach.call(document.querySelectorAll('[data-opt-set]'),function(b){b.setAttribute('aria-pressed',b.dataset.optSet===o?'true':'false')});
-    try{localStorage.setItem('ob901-opt',o)}catch(e){}
+    try{localStorage.setItem('ob901-opt2',o)}catch(e){}
   }
   document.addEventListener('click',function(e){
     var g=e.target.closest('[data-go]');
@@ -1505,8 +1605,8 @@ JS = r'''
     if(j===null)return;e.preventDefault();j=(j+tabs.length)%tabs.length;tabs[j].focus();show(tabs[j].dataset.go,true);
   });
   window.addEventListener('hashchange',function(){show(location.hash.slice(1),false)});
-  var saved=null;try{saved=localStorage.getItem('ob901-opt')}catch(e){}
-  setOpt(saved==='b'?'b':'a');
+  var saved=null;try{saved=localStorage.getItem('ob901-opt2')}catch(e){}
+  setOpt(saved==='a'?'a':'b');
   show((location.hash||'').slice(1),false);
   // casillas
   var KEY='ob901-checks',state={};
@@ -1565,6 +1665,7 @@ page = f'''<title>Obra Blanca Apto 901</title>
 .mname{{display:flex;align-items:center;gap:7px;font-size:.88rem;line-height:1.25}}
 .mname b{{font-weight:600}}
 .mcard small{{font-size:.76rem;color:var(--muted);line-height:1.35}}
+.mph{{aspect-ratio:4/3;display:grid;place-items:center;color:var(--muted);font:600 .8rem/1 var(--f-body);background:repeating-linear-gradient(135deg,var(--paper) 0 8px,var(--card) 8px 16px)}}
 :root:not([data-opt="b"]) .mcard.a{{border-color:var(--sA);box-shadow:0 0 0 1px var(--sA)}}
 :root[data-opt="b"] .mcard.b{{border-color:var(--sB);box-shadow:0 0 0 1px var(--sB)}}
 :root:not([data-opt="b"]) .mcard.b,:root[data-opt="b"] .mcard.a{{opacity:.7}}
@@ -1581,20 +1682,20 @@ page = f'''<title>Obra Blanca Apto 901</title>
     <div><dt>Área privada</dt><dd>44,30 m²<small>Altura libre ≈ 2,40 m</small></dd></div>
     <div><dt>Distribución</dt><dd>3 alcobas · 2 baños<small>Cocina-ropas · sala-comedor · balcón</small></dd></div>
     <div><dt>Opción A</dt><dd>$28,5–32,0 M<small>Sin electrodomésticos</small></dd></div>
-    <div><dt>Opción B</dt><dd>$32,0–35,5 M<small>Sin electrodomésticos</small></dd></div>
+    <div><dt>Elegida: B + península</dt><dd>$34,0–39,0 M<small>Sin electrodomésticos · estimado</small></dd></div>
     <div><dt>Precio</dt><dd>$210.000.000<small>VIS · Notaría 2 Bmga</small></dd></div>
   </dl>
 </div></header>
 <nav class="bar" aria-label="Vistas"><div class="wrap bar-in">
   <div class="tabs" role="tablist" aria-label="Vistas del apartamento">{tabs_html}</div>
   <div class="opt" role="group" aria-label="Opción de acabados"><span class="seg">
-    <button type="button" data-opt-set="a" aria-pressed="true"><span class="optchip a">A</span>Optimizada</button>
-    <button type="button" data-opt-set="b" aria-pressed="false"><span class="optchip b">B</span>Mejorada</button>
+    <button type="button" data-opt-set="a" aria-pressed="false"><span class="optchip a">A</span>Optimizada</button>
+    <button type="button" data-opt-set="b" aria-pressed="true"><span class="optchip b">B</span>Mejorada + península</button>
   </span></div>
 </div></nav>
 <main>{views_html}</main>
 <footer><div class="wrap">
-  <p><b>En resumen:</b> la propuesta lleva el apartamento a obra blanca sin tocar la distribución, con dos baños completos, cocina lineal nueva y closets en las tres alcobas. La recomendación es la Opción A reforzada, con techo de <b>$32,0 M</b> sin electrodomésticos.</p>
+  <p><b>En resumen:</b> elegiste la Opción B con una península de 1,50 × 0,90 m hacia la sala, sobre el plano real del 901: dos baños completos, cocina sobre el muro sur con nevera y torre al frente, y closets en las tres alcobas. Total estimado de <b>$34,0–39,0 M</b> sin electrodomésticos.</p>
   <p class="disc">Hecho a partir de tu contrato de promesa de compraventa, el anexo de especificaciones de Inacar y la Propuesta de acabados Tipo A del 29-sep-2026. Las vistas son conceptuales: no sirven para fabricar carpintería, cortar piedra ni mover redes sin medir en obra.</p>
 </div></footer>
 <script>{JS}</script>
