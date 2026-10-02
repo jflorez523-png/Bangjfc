@@ -105,8 +105,9 @@ ITEMS = [
         'Cerámica clara 30 × 60 a 1,20 m de alto detrás del lavadero y la lavadora, con retorno en el muro oriental.',
         'Boquilla antihongos y remates con perfil de aluminio.']),
     ('ENC-02', 'Salpicadero', 1.2, 'm²', '≈ 1,2 m²', [
-        'Cerámica marmolizada 30 × 60 entre el mesón y los muebles altos (2,03 × 0,57 m).',
-        'Se coloca después del mesón; recortes limpios para las tomas y perfil de aluminio en los bordes.']),
+        'Porcelanato gran formato 60 × 120 rectificado, blanco con veta muy suave, mate o satinado, en horizontal entre el mesón y los muebles altos (2,03 × 0,57 m).',
+        'Pegante flexible para gran formato con doble encolado y junta de 2 mm o menos con boquilla antihongos.',
+        'Se coloca después del mesón; cortes limpios para las tomas y perfil de aluminio en los bordes.']),
     ('PIS-01', 'Piso SPC de la cocina', 6.8, 'm²', '≈ 6,8 m²', [
         'SPC roble natural con ficha técnica: marca, espesor, capa de uso de 0,5 mm o más, base acústica IXPE y garantía.',
         'No debe quedar aprisionado bajo muebles fijos: se deja sin SPC la huella del mueble del muro sur, el módulo, la torre y la península, según el plano de despiece del carpintero. El zócalo del mueble tapa la dilatación.',
@@ -153,7 +154,7 @@ ALTS = [
     ('ALT-04', 'Lavadero compacto nuevo en lugar de reinstalar el entregado', 'HID-03'),
     ('ALT-05', 'Autonivelante en todo el piso de cocina y ropas en lugar de nivelación localizada', 'PIS-03'),
     ('ALT-06', 'Suministro de cubierta a gas de 4 puestos, horno empotrado de 60 cm y campana de 60 cm de gama media, con marca y referencia', 'APA-02'),
-    ('ALT-07', 'Salpicadero en la misma piedra sinterizada del mesón, en lugar de cerámica', 'ENC-02'),
+    ('ALT-07', 'Salpicadero en la misma piedra sinterizada del mesón, en lugar de porcelanato', 'ENC-02'),
 ]
 
 # ---------------------------------------------------------------- secciones
@@ -181,7 +182,7 @@ S.append(sec('materiales', '03 · Materiales', 'Acabados de la cocina', f'''
 <div class="mgrid2">
 {sample('spc-b', 'Piso de cocina', 'SPC roble natural')}
 {sample('tf-b', 'Piso de ropas', 'Cerámica antideslizante 30 × 30 gris piedra')}
-{sample('sp-b', 'Salpicadero', 'Cerámica marmolizada 30 × 60')}
+{sample('sp-b', 'Salpicadero', 'Porcelanato gran formato 60 × 120')}
 {sample('tw-b', 'Enchape de ropas', 'Cerámica clara 30 × 60')}
 {sample('ctr-b', 'Mesones', 'Piedra sinterizada blanca mate')}
 {sample('metal-b', 'Grifería', 'Acero inoxidable')}

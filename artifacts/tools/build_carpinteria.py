@@ -102,7 +102,7 @@ resumen_rows = ''.join(f'<tr><td class="z"><a href="#{c.split()[0].lower()}">{c}
 
 MAT_CARDS = '''<div class="grid2">
   <div class="card"><h3>Tableros y cantos</h3><ul>
-    <li><b>Tablero:</b> aglomerado o MDP RH (resistente a la humedad) de 18 mm en cuerpos, frentes y entrepaños. Indique marca (por ejemplo Tablemac/Pelikano, Duratex o Masisa).</li>
+    <li><b>Tablero:</b> MDP RH melamínico (aglomerado resistente a la humedad) de 18 mm en cuerpos, frentes y entrepaños. Indique marca (por ejemplo Tablemac/Pelikano, Duratex o Masisa).</li>
     <li><b>Fondos:</b> 9 mm RH en cocina y baños; mínimo 6 mm en closets.</li>
     <li><b>Cantos:</b> PVC de 2 mm en frentes y bordes vistos; 0,45 mm en bordes ocultos. Cola PUR en el mueble del lavaplatos y en los de baño.</li>
     <li><b>Textura:</b> supermate o antihuella en frentes, si la marca la tiene.</li>
@@ -138,8 +138,8 @@ S.append(sec('materiales', '03 · Materiales y herrajes', 'Lo que aplica a todos
 {MAT_CARDS}
 <h3 class="h3s">Colores</h3>
 <div class="mgrid2">
-{sample('upper-b', 'Muebles altos', 'Melamina RH blanco cálido')}
-{sample('lower-b', 'Bajos, península y torre', 'Melamina RH gris piedra suave')}
+{sample('upper-b', 'Muebles altos', 'MDP RH melamínico blanco cálido')}
+{sample('lower-b', 'Bajos, península y torre', 'MDP RH melamínico gris piedra suave')}
 {sample('clo-b', 'Closets, baños y panel TV', 'Melamina RH roble natural')}
 {sample('wpc-b', 'Frente de la península', 'WPC acanalado roble natural')}
 {sample('ctr-b', 'Mesones (COC-05)', 'Piedra sinterizada blanca mate')}
@@ -178,7 +178,7 @@ CARP = {
     'COC-05': ('Mesones (si los suministran)', 'Si no los suministran, indíquelo: se cotizan con marmolería', [
     ('Muro sur', '203 × 63,5 × 1,2', 'Piedra sinterizada blanca mate de 12 mm, con color en masa y ficha técnica; recortes para lavaplatos y cubierta con esquinas redondeadas; canto pulido; silicona neutra antihongos.'),
     ('Península y módulo', '100 × 94 + 80 × 64', 'En L: 100 × 94 cm en el tramo con voladizo y 80 × 64 cm en el resto de la península y el módulo de 30. El voladizo va sobre platina de acero oculta.'),
-    ('Salpicadero', '—', 'No es de carpintería: cerámica 30 × 60 que coloca el enchapador.'),
+    ('Salpicadero', '—', 'No es de carpintería: porcelanato gran formato que coloca el enchapador.'),
 ]),
     'CLO-01': ('Closet alcoba principal', 'Muro norte, junto a la ventana · 150 × 240 × 60', [
     ('Cuerpo 1', '50', 'Doble colgado con barras a 1,96 y 1,06 m.'),

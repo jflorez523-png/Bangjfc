@@ -286,7 +286,7 @@ OPC = [
     ('OPC-09', 'Cajillo en drywall con luz indirecta en la sala, solo si la altura lo permite', 'Sala'),
     ('OPC-10', 'Tira LED con sensor de movimiento dentro de los tres closets', 'CLO-01 a 03'),
     ('OPC-11', 'Puertas interiores en roble natural, para que combinen con los closets', 'PUE-01 a 04'),
-    ('OPC-12', 'Salpicadero en la misma piedra sinterizada del mesón, en lugar de cerámica', 'ENC-02'),
+    ('OPC-12', 'Salpicadero en la misma piedra sinterizada del mesón, en lugar de porcelanato', 'ENC-02'),
 ]
 opc_rows = ''.join(f'<tr><td class="z">{c}</td><td>{t}</td><td>{w}</td></tr>' for c, t, w in OPC)
 S.append(sec('opciones', f'{N + 1:02d} · Opciones', 'Cotizar por separado', f'''

@@ -24,7 +24,7 @@ export const OPT = {
   },
   b: {
     spc: '#C9A575', spcJ: '#9E7C52', upper: '#F4F1EA', lower: '#A9A49C', ctr: '#EEEBE5', sint: true,
-    ctrF: ['#8C8984', '#A7A39D', '#5A5856', '#C9C5BF', '#2E2D2C'], sp: '#ECEAE6', spJ: '#CFCAC2', spVeins: true,
+    ctrF: ['#8C8984', '#A7A39D', '#5A5856', '#C9C5BF', '#2E2D2C'], sp: '#ECEAE6', spJ: '#D6D1C9', spVeins: true, spBig: true,
     metal: { color: '#B4B8BD', roughness: 0.28, metalness: 1.0 }, tw: '#E9E7E3', twJ: '#CBC6BE',
     tf: '#B2AEA7', tfJ: '#8F8A82', clo: '#D2B28A', cloWood: true, van: '#C9A575', vanWood: true,
     gola: true, tower: true, lights2: true,
@@ -133,12 +133,12 @@ function sinteredSpec(base, seed = 12, px = 1024, size = 2.2) {
   return { tex, sx: size, sy: size };
 }
 
-function tileSpec({ tw, th, cols, rows, base, grout, px = 1024, vary = 0.025, veins = false, speckle = false, seed = 5 }) {
+function tileSpec({ tw, th, cols, rows, base, grout, px = 1024, vary = 0.025, veins = false, speckle = false, seed = 5, gap = null }) {
   const W = px, Hh = Math.round(px * rows * th / (cols * tw));
   const tex = canvasTex(W, Hh, (g) => {
     const r = rng(seed);
     g.fillStyle = grout; g.fillRect(0, 0, W, Hh);
-    const cw = W / cols, ch = Hh / rows, gp = Math.max(2, px / 260);
+    const cw = W / cols, ch = Hh / rows, gp = gap ?? Math.max(2, px / 260);
     for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
       const x = i * cw + gp / 2, y = j * ch + gp / 2, w = cw - gp, h = ch - gp;
       g.fillStyle = jitter(base, vary, 0.02, r); g.fillRect(x, y, w, h);
@@ -370,7 +370,9 @@ function materials(P) {
   M.spc = woodSpec(P.spc, P.spcJ, { seed: P === OPT.a ? 2 : 4 });
   M.granite = P.sint ? sinteredSpec(P.ctr) : graniteSpec(P.ctr, P.ctrF, 3);
   M.ctrR = P.sint ? 0.34 : 0.16;
-  M.splash = tileSpec({ tw: 0.6, th: 0.3, cols: 2, rows: 4, base: P.sp, grout: P.spJ, veins: P.spVeins, seed: 6 });
+  M.splash = P.spBig  // porcelanato 60 × 120 en horizontal, junta de 2 mm
+    ? tileSpec({ tw: 1.2, th: 0.6, cols: 2, rows: 1, px: 2048, base: P.sp, grout: P.spJ, veins: true, vary: 0.008, seed: 6, gap: 2 })
+    : tileSpec({ tw: 0.6, th: 0.3, cols: 2, rows: 4, base: P.sp, grout: P.spJ, veins: P.spVeins, seed: 6 });
   M.wallTile = tileSpec({ tw: 0.6, th: 0.3, cols: 2, rows: 4, base: P.tw, grout: P.twJ, seed: 8 });
   M.floorTile = tileSpec({ tw: 0.3, th: 0.3, cols: 4, rows: 4, base: P.tf, grout: P.tfJ, speckle: true, vary: 0.035, seed: 10 });
   M.balconyTile = M.floorTile;
