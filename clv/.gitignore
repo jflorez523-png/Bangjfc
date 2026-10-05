@@ -1,0 +1,8 @@
+picks.csv
+estado.json
+estado.tmp
+capturas.csv
+clv_cierre.csv
+clv_cierre.tmp
+diagnostico/
+__pycache__/
